@@ -84,82 +84,293 @@ def check_alarms():
 
             for record in records:
                 timestamp = record['Timestamp']
-                alarm_description = None
 
                 v_of_device = record.get('V_of_Device', None)
                 right_turn = record.get('RightTurn', None)
                 left_turn = record.get('LeftTurn', None)
                 temprature = record.get('Temperature', None)
                 sobs3ap = record.get('SOBS3AP', None)
-                uAB = record.get('U_AB', None)   #AB faza gərginlik həddi 
-                uBC = record.get('U_BC', None)   #BC faza gərginlik həddi 
-                uAC = record.get('U_AC', None)   #AC faza gərginlik həddi 
+                uAB = record.get('U_AB', None)   # AB faza gərginlik həddi 
+                uBC = record.get('U_BC', None)   # BC faza gərginlik həddi 
+                uAC = record.get('U_AC', None)   # AC faza gərginlik həddi 
                 phaseA = record.get('Current_Accident_A', None)
                 phaseB = record.get('Current_Accident_B', None)
                 phaseC = record.get('Current_Accident_C', None)
 
+                # Create a separate alarm for each condition
                 if v_of_device is not None:
                     if v_of_device < 8:
-                        alarm_description = "Qida gərginliyi normadan aşağıdır."
+                        alarms.append({
+                            'TableNumber': f"YD-{str(table_num).zfill(2)}",
+                            'V_of_Device': v_of_device,
+                            'RightTurn': right_turn,
+                            'LeftTurn': left_turn,
+                            'Temperature': temprature,
+                            'SOBS3AP' : sobs3ap,
+                            'U_AB' : uAB,
+                            'U_BC' : uBC,
+                            'U_AC' : uAC,
+                            'Current_Accident_A' : phaseA,
+                            'Current_Accident_B' : phaseB,
+                            'Current_Accident_C' : phaseC,
+                            'Timestamp': timestamp,
+                            'AlarmDescription': "Qida gərginliyi normadan aşağıdır.",
+                        })
                     elif v_of_device > 12:
-                        alarm_description = "Qida gərginliyi normadan artıqdır."
+                        alarms.append({
+                            'TableNumber': f"YD-{str(table_num).zfill(2)}",
+                            'V_of_Device': v_of_device,
+                            'RightTurn': right_turn,
+                            'LeftTurn': left_turn,
+                            'Temperature': temprature,
+                            'SOBS3AP' : sobs3ap,
+                            'U_AB' : uAB,
+                            'U_BC' : uBC,
+                            'U_AC' : uAC,
+                            'Current_Accident_A' : phaseA,
+                            'Current_Accident_B' : phaseB,
+                            'Current_Accident_C' : phaseC,
+                            'Timestamp': timestamp,
+                            'AlarmDescription': "Qida gərginliyi normadan artıqdır.",
+                        })
 
+                if right_turn is not None and left_turn is not None:
                     if right_turn == 0 and left_turn == 0:
-                        alarm_description = "Yol dəyişdirici qəza vəziyyətindədir!"
+                        alarms.append({
+                            'TableNumber': f"YD-{str(table_num).zfill(2)}",
+                            'V_of_Device': v_of_device,
+                            'RightTurn': right_turn,
+                            'LeftTurn': left_turn,
+                            'Temperature': temprature,
+                            'SOBS3AP' : sobs3ap,
+                            'U_AB' : uAB,
+                            'U_BC' : uBC,
+                            'U_AC' : uAC,
+                            'Current_Accident_A' : phaseA,
+                            'Current_Accident_B' : phaseB,
+                            'Current_Accident_C' : phaseC,
+                            'Timestamp': timestamp,
+                            'AlarmDescription': "Yol dəyişdirici qəza vəziyyətindədir!",
+                        })
                     elif right_turn == 1 and left_turn == 1:
-                        alarm_description = "Yol dəyişdiriciyə nəzarət yoxdur."
+                        alarms.append({
+                            'TableNumber': f"YD-{str(table_num).zfill(2)}",
+                            'V_of_Device': v_of_device,
+                            'RightTurn': right_turn,
+                            'LeftTurn': left_turn,
+                            'Temperature': temprature,
+                            'SOBS3AP' : sobs3ap,
+                            'U_AB' : uAB,
+                            'U_BC' : uBC,
+                            'U_AC' : uAC,
+                            'Current_Accident_A' : phaseA,
+                            'Current_Accident_B' : phaseB,
+                            'Current_Accident_C' : phaseC,
+                            'Timestamp': timestamp,
+                            'AlarmDescription': "Yol dəyişdiriciyə nəzarət yoxdur.",
+                        })
 
-                if temprature is not None and temprature >= 50:
-                    alarm_description = "Temperatur normadan artıqdır!"
+                if temprature is not None:
+                    if temprature >= 50:
+                        alarms.append({
+                            'TableNumber': f"YD-{str(table_num).zfill(2)}",
+                            'V_of_Device': v_of_device,
+                            'RightTurn': right_turn,
+                            'LeftTurn': left_turn,
+                            'Temperature': temprature,
+                            'SOBS3AP' : sobs3ap,
+                            'U_AB' : uAB,
+                            'U_BC' : uBC,
+                            'U_AC' : uAC,
+                            'Current_Accident_A' : phaseA,
+                            'Current_Accident_B' : phaseB,
+                            'Current_Accident_C' : phaseC,
+                            'Timestamp': timestamp,
+                            'AlarmDescription': "Temperatur normadan artıqdır!",
+                        })
 
-                if sobs3ap is not None and sobs3ap == 0:
-                    alarm_description = "Nəzarətə gələn gərginlik sıfırdır!"
+                if sobs3ap is not None:
+                    if sobs3ap == 0:
+                        alarms.append({
+                            'TableNumber': f"YD-{str(table_num).zfill(2)}",
+                            'V_of_Device': v_of_device,
+                            'RightTurn': right_turn,
+                            'LeftTurn': left_turn,
+                            'Temperature': temprature,
+                            'SOBS3AP' : sobs3ap,
+                            'U_AB' : uAB,
+                            'U_BC' : uBC,
+                            'U_AC' : uAC,
+                            'Current_Accident_A' : phaseA,
+                            'Current_Accident_B' : phaseB,
+                            'Current_Accident_C' : phaseC,
+                            'Timestamp': timestamp,
+                            'AlarmDescription': "Nəzarətə gələn gərginlik sıfırdır!",
+                        })
 
                 if uAB and uBC and uAC is not None:
                     if int(uAB) >= 140:
-                        alarm_description = "AB faza gərginlik həddi 140 V-dan (Volt) böyükdür!"
+                        alarms.append({
+                            'TableNumber': f"YD-{str(table_num).zfill(2)}",
+                            'V_of_Device': v_of_device,
+                            'RightTurn': right_turn,
+                            'LeftTurn': left_turn,
+                            'Temperature': temprature,
+                            'SOBS3AP' : sobs3ap,
+                            'U_AB' : uAB,
+                            'U_BC' : uBC,
+                            'U_AC' : uAC,
+                            'Current_Accident_A' : phaseA,
+                            'Current_Accident_B' : phaseB,
+                            'Current_Accident_C' : phaseC,
+                            'Timestamp': timestamp,
+                            'AlarmDescription': "AB faza gərginlik həddi 140 V-dan (Volt) böyükdür!",
+                        })
                     elif int(uBC) >= 140:
-                        alarm_description = "BC faza gərginlik həddi 140 V-dan (Volt) böyükdür!"
+                        alarms.append({
+                            'TableNumber': f"YD-{str(table_num).zfill(2)}",
+                            'V_of_Device': v_of_device,
+                            'RightTurn': right_turn,
+                            'LeftTurn': left_turn,
+                            'Temperature': temprature,
+                            'SOBS3AP' : sobs3ap,
+                            'U_AB' : uAB,
+                            'U_BC' : uBC,
+                            'U_AC' : uAC,
+                            'Current_Accident_A' : phaseA,
+                            'Current_Accident_B' : phaseB,
+                            'Current_Accident_C' : phaseC,
+                            'Timestamp': timestamp,
+                            'AlarmDescription': "BC faza gərginlik həddi 140 V-dan (Volt) böyükdür!",
+                        })
                     elif int(uAC) >= 140:
-                        alarm_description = "AC faza gərginlik həddi 140 V-dan (Volt) böyükdür!"
+                        alarms.append({
+                            'TableNumber': f"YD-{str(table_num).zfill(2)}",
+                            'V_of_Device': v_of_device,
+                            'RightTurn': right_turn,
+                            'LeftTurn': left_turn,
+                            'Temperature': temprature,
+                            'SOBS3AP' : sobs3ap,
+                            'U_AB' : uAB,
+                            'U_BC' : uBC,
+                            'U_AC' : uAC,
+                            'Current_Accident_A' : phaseA,
+                            'Current_Accident_B' : phaseB,
+                            'Current_Accident_C' : phaseC,
+                            'Timestamp': timestamp,
+                            'AlarmDescription': "AC faza gərginlik həddi 140 V-dan (Volt) böyükdür!",
+                        })
                     
                     if int(uAB) <= 100:
-                        alarm_description = "AB faza gərginlik həddi 100 V-dan (Volt) aşağıdır!"
+                        alarms.append({
+                            'TableNumber': f"YD-{str(table_num).zfill(2)}",
+                            'V_of_Device': v_of_device,
+                            'RightTurn': right_turn,
+                            'LeftTurn': left_turn,
+                            'Temperature': temprature,
+                            'SOBS3AP' : sobs3ap,
+                            'U_AB' : uAB,
+                            'U_BC' : uBC,
+                            'U_AC' : uAC,
+                            'Current_Accident_A' : phaseA,
+                            'Current_Accident_B' : phaseB,
+                            'Current_Accident_C' : phaseC,
+                            'Timestamp': timestamp,
+                            'AlarmDescription': "AB faza gərginlik həddi 100 V-dan (Volt) aşağıdır!",
+                        })
                     elif int(uBC) <= 100:
-                        alarm_description = "BC faza gərginlik həddi 100 V-dan (Volt) aşağıdır!"
+                        alarms.append({
+                            'TableNumber': f"YD-{str(table_num).zfill(2)}",
+                            'V_of_Device': v_of_device,
+                            'RightTurn': right_turn,
+                            'LeftTurn': left_turn,
+                            'Temperature': temprature,
+                            'SOBS3AP' : sobs3ap,
+                            'U_AB' : uAB,
+                            'U_BC' : uBC,
+                            'U_AC' : uAC,
+                            'Current_Accident_A' : phaseA,
+                            'Current_Accident_B' : phaseB,
+                            'Current_Accident_C' : phaseC,
+                            'Timestamp': timestamp,
+                            'AlarmDescription': "BC faza gərginlik həddi 100 V-dan (Volt) aşağıdır!",
+                        })
                     elif int(uAC) <= 100:
-                        alarm_description = "AC faza gərginlik həddi 100 V-dan (Volt) aşağıdır!"
+                        alarms.append({
+                            'TableNumber': f"YD-{str(table_num).zfill(2)}",
+                            'V_of_Device': v_of_device,
+                            'RightTurn': right_turn,
+                            'LeftTurn': left_turn,
+                            'Temperature': temprature,
+                            'SOBS3AP' : sobs3ap,
+                            'U_AB' : uAB,
+                            'U_BC' : uBC,
+                            'U_AC' : uAC,
+                            'Current_Accident_A' : phaseA,
+                            'Current_Accident_B' : phaseB,
+                            'Current_Accident_C' : phaseC,
+                            'Timestamp': timestamp,
+                            'AlarmDescription': "AC faza gərginlik həddi 100 V-dan (Volt) aşağıdır!",
+                        })
                 
                 if phaseA and phaseB and phaseC is not None:
                     if int(phaseA) >= 3:
-                        alarm_description = "A fazasında olan cərəyanın 10 qiymətin hər biri üçün hədd 3A-dən (Amper) böyükdür"
+                        alarms.append({
+                            'TableNumber': f"YD-{str(table_num).zfill(2)}",
+                            'V_of_Device': v_of_device,
+                            'RightTurn': right_turn,
+                            'LeftTurn': left_turn,
+                            'Temperature': temprature,
+                            'SOBS3AP' : sobs3ap,
+                            'U_AB' : uAB,
+                            'U_BC' : uBC,
+                            'U_AC' : uAC,
+                            'Current_Accident_A' : phaseA,
+                            'Current_Accident_B' : phaseB,
+                            'Current_Accident_C' : phaseC,
+                            'Timestamp': timestamp,
+                            'AlarmDescription': "A fazasında olan cərəyanın 10 qiymətin hər biri üçün hədd 3A-dən (Amper) böyükdür",
+                        })
                     elif int(phaseB) >= 3:
-                        alarm_description = "B fazasında olan cərəyanın 10 qiymətin hər biri üçün hədd 3A-dən (Amper) böyükdür"
+                        alarms.append({
+                            'TableNumber': f"YD-{str(table_num).zfill(2)}",
+                            'V_of_Device': v_of_device,
+                            'RightTurn': right_turn,
+                            'LeftTurn': left_turn,
+                            'Temperature': temprature,
+                            'SOBS3AP' : sobs3ap,
+                            'U_AB' : uAB,
+                            'U_BC' : uBC,
+                            'U_AC' : uAC,
+                            'Current_Accident_A' : phaseA,
+                            'Current_Accident_B' : phaseB,
+                            'Current_Accident_C' : phaseC,
+                            'Timestamp': timestamp,
+                            'AlarmDescription': "B fazasında olan cərəyanın 10 qiymətin hər biri üçün hədd 3A-dən (Amper) böyükdür",
+                        })
                     elif int(phaseC) >= 3:
-                        alarm_description = "C fazasında olan cərəyanın 10 qiymətin hər biri üçün hədd 3A-dən (Amper) böyükdür"
-                    
-                
-                if alarm_description:
-                    alarms.append({
-                        'TableNumber': f"YD-{str(table_num).zfill(2)}",
-                        'V_of_Device': v_of_device,
-                        'RightTurn': right_turn,
-                        'LeftTurn': left_turn,
-                        'Temperature': temprature,
-                        'SOBS3AP' : sobs3ap,
-                        'U_AB' : uAB,
-                        'U_BC' : uBC,
-                        'U_AC' : uAC,
-                        'Current_Accident_A' : phaseA,
-                        'Current_Accident_B' : phaseB,
-                        'Current_Accident_C' : phaseC,
-                        'Timestamp': timestamp,
-                        'AlarmDescription': alarm_description,
-                    })
+                        alarms.append({
+                            'TableNumber': f"YD-{str(table_num).zfill(2)}",
+                            'V_of_Device': v_of_device,
+                            'RightTurn': right_turn,
+                            'LeftTurn': left_turn,
+                            'Temperature': temprature,
+                            'SOBS3AP' : sobs3ap,
+                            'U_AB' : uAB,
+                            'U_BC' : uBC,
+                            'U_AC' : uAC,
+                            'Current_Accident_A' : phaseA,
+                            'Current_Accident_B' : phaseB,
+                            'Current_Accident_C' : phaseC,
+                            'Timestamp': timestamp,
+                            'AlarmDescription': "C fazasında olan cərəyanın 10 qiymətin hər biri üçün hədd 3A-dən (Amper) böyükdür",
+                        })
+
         alarms_sorted = sorted(alarms, key=lambda x: x['Timestamp'], reverse=True)
         return alarms_sorted
     finally:
         db_info_package.close()
+
 
 @app.route('/table_names', methods=['GET'])
 def get_table_names():
