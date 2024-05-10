@@ -11,7 +11,7 @@ const IntervalAnalysisPage = () => {
   const [timestamps, setTimestamps] = useState([]);
   const [VofDeviceData, setVofDeviceData] = useState([]);
   const [temperatureData, setTemperatureData] = useState([]);
-  const [voltageData, setVoltageData] = useState([]);
+  const [vOfDevice, setvOfDevice] = useState([]);
   const [BlockContactNData, setBlockContactNData] = useState([]);
   const [numberOfChangeData, setNumberOfChangeData] = useState([]);
   const [showChart, setShowChart] = useState(false);
@@ -20,6 +20,24 @@ const IntervalAnalysisPage = () => {
   const handleTableChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedTable(event.target.value);
     setTableChanged(true);
+  };
+
+  const formatDate = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+      timeZone: "UTC",
+    };
+
+    const formattedDate = date.toLocaleString("en-GB", options);
+
+    return formattedDate.replace(/,/, '');
   };
 
   const handleFetchDataClick = () => {
@@ -52,7 +70,7 @@ const IntervalAnalysisPage = () => {
           .then((response) => response.json())
           .then((data) => {
             console.log(data);
-            setVoltageData(data.voltageData);
+            setvOfDevice(data.vOfDevice);
             setShowChart(true);
           })
           .catch((error) => console.error('Error fetching Voltage data:', error));
@@ -113,9 +131,9 @@ useEffect(() => {
 
 
   return (
-    <div className="w-full ml-10 mr-10 mt-3">
-      <div className="mt-5">
-        <div className=" bg-white rounded-lg shadow-md p-6 flex items-center justify-between mt-4">
+    <div className="w-full ml-10 mr-10 mt-3 ">
+      <div className="mt-5 overflow-x-auto">
+        <div className="bg-white rounded-lg shadow-md p-6 flex items-center justify-between mt-4">
           <div className="flex items-center">
             <label className="ml-7 mr-2 text-xl font-semibold">YD-nın nömrəsi:</label>
             <select
@@ -164,10 +182,10 @@ useEffect(() => {
           </div>
         </div>
 
-        <div>
-          <div className="w-full p-6 bg-white rounded-lg shadow-md flex items-center mt-4">
+        <div className='w-full'>
+          <div className="p-6 bg-white rounded-lg shadow-md mt-4 overflow-x-auto">
             {showChart && VofDeviceData && VofDeviceData.length > 0 && (
-              <LineChart width={1700} height={400} data={VofDeviceData}>
+              <LineChart width={1450} height={400} data={VofDeviceData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="Timestamp" />
                 <YAxis domain={[0, 20]} />
@@ -180,9 +198,9 @@ useEffect(() => {
         </div>
 
         <div>
-          <div className="w-full p-6 bg-white rounded-lg shadow-md flex items-center mt-4">
+          <div className="w-full p-6 bg-white rounded-lg shadow-md flex items-center mt-4 overflow-x-auto">
             {showChart && temperatureData && temperatureData.length > 0 && (
-              <LineChart width={1700} height={400} data={temperatureData}>
+              <LineChart width={1450} height={400} data={temperatureData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="Timestamp" />
                 <YAxis domain={[0, 100]} />
@@ -195,9 +213,9 @@ useEffect(() => {
         </div>
 
         <div>
-          <div className="w-full p-6 bg-white rounded-lg shadow-md flex items-center mt-4">
-            {showChart && voltageData && voltageData.length > 0 && (
-              <LineChart width={1700} height={400} data={voltageData}>
+          <div className="w-full p-6 bg-white rounded-lg shadow-md flex items-center mt-4 overflow-x-auto">
+            {showChart && vOfDevice && vOfDevice.length > 0 && (
+              <LineChart width={1450} height={400} data={vOfDevice}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="Timestamp" />
                 <YAxis domain={[0, 150]} />
@@ -210,9 +228,9 @@ useEffect(() => {
         </div>
 
         <div>
-          <div className="w-full p-6 bg-white rounded-lg shadow-md flex items-center mt-4">
+          <div className="w-full p-6 bg-white rounded-lg shadow-md flex items-center mt-4 ">
             {showChart && BlockContactNData && BlockContactNData.length > 0 && (
-              <BarChart width={1700} height={400} data={BlockContactNData}>
+              <BarChart width={1450} height={400} data={BlockContactNData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="TimeStamp" />
                 <YAxis />
@@ -225,9 +243,9 @@ useEffect(() => {
         </div>
 
         <div>
-          <div className="w-full p-6 bg-white rounded-lg shadow-md flex items-center mt-4">
+          <div className="w-full p-6 bg-white rounded-lg shadow-md items-center mt-4 overflow-x-auto">
             {showChart && numberOfChangeData && numberOfChangeData.length > 0 && (
-              <BarChart width={1700} height={400} data={numberOfChangeData}>
+              <BarChart width={1450} height={400} data={numberOfChangeData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="Timestamp" />
                 <YAxis />

@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@headlessui/react": "^1.7.19",
     "@react-icons/all-files": "^4.1.0",
     "@types/chart.js": "2.x",
     "@types/react-chartjs-2": "^2.5.7",

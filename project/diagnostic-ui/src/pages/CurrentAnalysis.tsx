@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { AiFillWarning } from "react-icons/ai";
+import React, { useState, useEffect } from "react";
 import TesdiqButton from "../layouts/AuthLayout/components/TesdiqButton";
 
 interface TableData {
@@ -7,40 +6,71 @@ interface TableData {
 }
 
 const CurrentAnalysis = () => {
-
   const columnNames = [
-    "Blok-kontakt",
-    "Cihazın temperaturu",
-    "YD-nin cərəyanının orta qıyməti",
-    "YD-nin gərginliyi",
-    "YD-nın nəzarəti",
-    "YD-nın çevrilmə müddəti"
+    "Məlumat qəbulu",
+    "Gərginlik Faza AB",
+    "Nəzarət",
+    "Gərginlik Faza BC",
+    "Nəzarətin itmə sayı",
+    "Gərginlik Faza AC",
+    "YD-nın çevrilmə sayı",
+    "Qəza cərəyanı Faza A",
+    "Kurbel ilə",
+    "Qəza cərəyanı Faza B",
+    "Nəzarətə gələn gərginlik",
+    "Qəza cərəyanı Faza C",
+    "Nəzarətə gələn gərginliyin itmə sayı",
+    "Cihazın qida gərginliyi",
+    "Temperatur",
+    "YD-nın çevrilmə müddəti",
+    "Blok-Kontakt",
+    "YD-nın çevrilmə cərəyanı",
+    "Blok-Kontakt sayı",
+    "Vaxt"
   ];
-  const [tableNames, setTableNames] = useState([]);
-  const [selectedTable, setSelectedTable] = useState<string>("");
-  const [phaseMessage, setPhaseMessage] = useState<string | null>(null);
+
+  const [tableNumbers, setTableNumbers] = useState<string[]>([]);
+  const [selectedTableNumber, setSelectedTableNumber] = useState<string>("");
   const [tableData, setTableData] = useState<TableData>({});
-  const [currentDifferenceMessage, setCurrentDifferenceMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('http://localhost:5000/table_names')
+    fetch("http://localhost:5000/table_numbers")
       .then((response) => response.json())
       .then((data) => {
-        setTableNames(data.tables);
+        setTableNumbers(data.table_numbers);
       })
       .catch((error) => {
-        console.error('Error fetching table names:', error);
+        console.error("Error fetching table numbers:", error);
       });
   }, []);
 
+  const formatDate = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+      timeZone: "UTC",
+    };
+
+    const formattedDate = date.toLocaleString("en-GB", options);
+
+    return formattedDate.replace(/,/, '');
+  };
+  
   const handleButtonClick = () => {
-    if (selectedTable) {
+    if (selectedTableNumber) {
+      const selectedTableName = `yd_${selectedTableNumber}`;
       fetch("http://localhost:5000/table_data", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ table: selectedTable }),
+        body: JSON.stringify({ table: selectedTableName }),
       })
         .then((response) => {
           if (!response.ok) {
@@ -50,8 +80,11 @@ const CurrentAnalysis = () => {
         })
         .then((data) => {
           setTableData(data);
-          setPhaseMessage(data["Phase"] || null);
-          setCurrentDifferenceMessage(data["Current_Difference"] || null);
+          fetch("http://localhost:5000/alarms")
+            .then((response) => response.json())
+            .catch((error) => {
+              console.error("Error fetching alarms:", error);
+            });
         })
         .catch((error) => {
           console.error("Error fetching table data:", error);
@@ -60,77 +93,55 @@ const CurrentAnalysis = () => {
   };
 
   return (
-    <div className="w-full ml-10 mr-10 mt-3">
-      <div className="mt-5">
-        <div className=" bg-white rounded-lg shadow-md p-6 flex items-center justify-between mt-4">
-          <div className="flex items-center">
-            <p className="font-bold text-2xl pl-3 text-gray-800">YD-nın nömrəsi</p>
-            <div className="ml-4">
-              <select
-                className="px-4 py-2 border border-main-blue rounded-lg"
-                value={selectedTable}
-                onChange={(e) => setSelectedTable(e.target.value)}
-              >
-                <option value="">YD-nı seçin</option>
-                {tableNames.map((tableName) => (
-                  <option key={tableName} value={tableName}>
-                    {tableName}
-                  </option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                <svg
-                  className="fill-current h-4 w-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 12l-5-5 1.5-1.5L10 9.02l3.5-3.5L15 7z"
-                  />
-                </svg>
+    <div className="w-full ml-10 mr-10">
+      <div className="bg-white rounded-lg shadow-md p-6 flex items-center justify-between mt-4">
+        <div className="flex items-center">
+          <label className="mr-8 text-xl font-semibold">YD-nın nömrəsi:</label>
+          <select
+            value={selectedTableNumber}
+            onChange={(e) => setSelectedTableNumber(e.target.value)}
+            className="px-4 py-2 border border-main-blue rounded-lg"
+          >
+            <option value="">YD-nı seçin</option>
+            {tableNumbers.map((num: string) => (
+              <option key={num} value={num}>
+                {num}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="mr-4">
+          <TesdiqButton onClick={handleButtonClick} disabled={!selectedTableNumber}>
+            Təsdiqlə
+          </TesdiqButton>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow-md p-6 grid grid-cols-2 gap-4 mt-4">
+        {columnNames.map((name) => (
+          <div key={name} className="flex justify-between">
+            <div className="w-1/2 pr-2">
+              <p className="font-semibold text-xl text-gray-800">{name}</p>
+            </div>
+            <div className='w-1/2 pl-2bg-red-300'>
+              <div className="bg-main rounded p-2">
+                <table className="w-full">
+                  <tbody>
+                    <tr className="flex justify-between">
+                      <td className="font-semibold pl-2 pr-2">Qiymət: </td>
+                      <td className="pr-2">
+                        {name === 'Vaxt' ? formatDate(tableData[name] as string) : tableData[name]}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
-          <div className="mr-4">
-            <TesdiqButton onClick={handleButtonClick} disabled={!selectedTable}>
-              Təsdiqlə
-            </TesdiqButton>
-          </div>
-        </div>
-      </div>
+        ))}
 
-      <div className="mt-5">
-        <div className="w-full p-6 bg-white rounded-lg shadow-md flex items-center justify-between mt-4">
-          <div>
-            <table>
-              <tbody>
-                {columnNames.map((name) => (
-                  <tr key={name}>
-                    <td className="font-bold text-2xl p-4 text-gray-800">{name}</td>
-                    <td className="p-4">
-                      <div className="bg-main rounded text-black py-3 px-6 font-bold hover:bg-opacity-75 transition-colors ">
-                        {tableData[name]}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <div className="">
-        <div className="w-full p-6 bg-white rounded-lg shadow-md flex items-center mt-4">
-          <AiFillWarning className="text-red-500 text-8xl" />
-          <div className="pl-10 text-xl text-gray-800">
-            {phaseMessage} {currentDifferenceMessage}
-          </div>
-        </div>
       </div>
     </div>
-
   );
 };
 
