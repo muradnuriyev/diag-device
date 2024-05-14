@@ -1,44 +1,56 @@
 from flask import Flask, request, jsonify
-from mysql.connector import pooling
 from flask_cors import CORS
 from datetime import datetime, timezone, timedelta
+import mysql.connector.pooling
+import types
+
 
 app = Flask(__name__)
 CORS(app, origins="http://localhost:5173")
 
 user_db_config = {
     "pool_name": "user_db_pool",
-    "pool_size": 5,
+    "pool_size": 10,
     "host": "localhost",
     "user": "root",
     "password": "",
     "database": "yd_user_db",
     "connect_timeout": 30,
 }
-user_db_pool = pooling.MySQLConnectionPool(**user_db_config)
 
 user_note_db_config = {
     "pool_name": "user_note_db_pool",
-    "pool_size": 5,
+    "pool_size": 10,
     "host": "localhost",
     "user": "root",
     "password": "",
     "database": "yd_note_workers",
     "connect_timeout": 30,
 }
-user_note_db_pool = pooling.MySQLConnectionPool(**user_note_db_config)
 
 info_package_db_config = {
     "pool_name": "info_package_db_pool",
-    "pool_size": 5,
+    "pool_size": 10,
     "host": "localhost",
     "user": "root",
     "password": "",
     "database": "yd_information_package",
     "connect_timeout": 30,
 }
-info_package_db_pool = pooling.MySQLConnectionPool(**info_package_db_config)
 
+user_db_pool = mysql.connector.pooling.MySQLConnectionPool(**user_db_config)
+user_note_db_pool = mysql.connector.pooling.MySQLConnectionPool(**user_note_db_config)
+info_package_db_pool = mysql.connector.pooling.MySQLConnectionPool(**info_package_db_config)
+
+def add_connection(pool, connection):
+    pool._cnx_queue.put(connection)
+
+user_db_pool.add = types.MethodType(add_connection, user_db_pool)
+user_note_db_pool.add = types.MethodType(add_connection, user_note_db_pool)
+info_package_db_pool.add = types.MethodType(add_connection, info_package_db_pool)
+
+
+#================================================================================================================================================================================
 @app.route('/login', methods=['POST'])
 def login():
     db_user = user_db_pool.get_connection()
@@ -375,6 +387,7 @@ def get_alarms():
         db_info_package.close()
 
 
+#================================================================================================================================================================================
 @app.route('/table_names', methods=['GET'])
 def get_table_names():
     db_info_package = info_package_db_pool.get_connection()
@@ -460,6 +473,8 @@ def get_table_data():
     finally:
         db_info_package.close()
 
+
+#================================================================================================================================================================================
 @app.route('/table_numbers', methods=['GET'])
 def get_table_numbers():
     db_info_package = info_package_db_pool.get_connection()
@@ -541,28 +556,75 @@ def get_temperature_data(table, from_timestamp, to_timestamp):
     finally:
         db_info_package.close()
 
-@app.route('/voltage_data/<table>/<from_timestamp>/<to_timestamp>', methods=['GET'])
-def get_voltage_data(table, from_timestamp, to_timestamp):
+@app.route('/current_values_data/<table>/<from_timestamp>/<to_timestamp>', methods=['GET'])
+def get_current_values_data(table, from_timestamp, to_timestamp):
     db_info_package = info_package_db_pool.get_connection()
     try:
         if table and from_timestamp and to_timestamp:
             formatted_from_timestamp = datetime.fromisoformat(from_timestamp[:-1]).replace(tzinfo=timezone.utc)
             formatted_to_timestamp = datetime.fromisoformat(to_timestamp[:-1]).replace(tzinfo=timezone.utc)
 
-            query = f"SELECT Timestamp, Voltage FROM `{table}` WHERE Timestamp >= %s AND Timestamp <= %s ORDER BY Timestamp ASC"
+            query = f"SELECT Timestamp, CurrentValue1, CurrentValue2, CurrentValue3, CurrentValue4, CurrentValue5, CurrentValue6, CurrentValue7, CurrentValue8, CurrentValue9, CurrentValue10 FROM `{table}` WHERE Timestamp >= %s AND Timestamp <= %s ORDER BY Timestamp ASC"
 
             try:
                 with db_info_package.cursor(dictionary=True) as cursor:
                     cursor.execute(query, (formatted_from_timestamp, formatted_to_timestamp))
-                    voltage_data = cursor.fetchall()
+                    current_values_data = cursor.fetchall()
 
-                response = jsonify({'voltageData': voltage_data})
+                response = jsonify({'currentValuesData': current_values_data})
                 return response
             except Exception as e:
-                print(f"Error fetching voltage data: {e}")
+                print(f"Error fetching current values data: {e}")
                 return jsonify({'error': 'An error occurred'}), 500
     finally:
         db_info_package.close()
+
+@app.route('/current_accident_values_data/<table>/<from_timestamp>/<to_timestamp>', methods=['GET'])
+def get_current_accident_values_data(table, from_timestamp, to_timestamp):
+    db_info_package = info_package_db_pool.get_connection()
+    try:
+        if table and from_timestamp and to_timestamp:
+            formatted_from_timestamp = datetime.fromisoformat(from_timestamp[:-1]).replace(tzinfo=timezone.utc)
+            formatted_to_timestamp = datetime.fromisoformat(to_timestamp[:-1]).replace(tzinfo=timezone.utc)
+
+            query = f"SELECT Timestamp, Current_Accident_A, Current_Accident_B, Current_Accident_C FROM `{table}` WHERE Timestamp >= %s AND Timestamp <= %s ORDER BY Timestamp ASC"
+
+            try:
+                with db_info_package.cursor(dictionary=True) as cursor:
+                    cursor.execute(query, (formatted_from_timestamp, formatted_to_timestamp))
+                    current_accident_values_data = cursor.fetchall()
+
+                response = jsonify({'currentAccidentValuesData': current_accident_values_data})
+                return response
+            except Exception as e:
+                print(f"Error fetching current accident values data: {e}")
+                return jsonify({'error': 'An error occurred'}), 500
+    finally:
+        db_info_package.close()
+
+@app.route('/u_all_data/<table>/<from_timestamp>/<to_timestamp>', methods=['GET'])
+def get_u_all_data(table, from_timestamp, to_timestamp):
+    db_info_package = info_package_db_pool.get_connection()
+    try:
+        if table and from_timestamp and to_timestamp:
+            formatted_from_timestamp = datetime.fromisoformat(from_timestamp[:-1]).replace(tzinfo=timezone.utc)
+            formatted_to_timestamp = datetime.fromisoformat(to_timestamp[:-1]).replace(tzinfo=timezone.utc)
+
+            query = f"SELECT Timestamp, U_AB, U_BC, U_AC FROM `{table}` WHERE Timestamp >= %s AND Timestamp <= %s ORDER BY Timestamp ASC"
+
+            try:
+                with db_info_package.cursor(dictionary=True) as cursor:
+                    cursor.execute(query, (formatted_from_timestamp, formatted_to_timestamp))
+                    u_all_data = cursor.fetchall()
+
+                response = jsonify({'uAllData': u_all_data})
+                return response
+            except Exception as e:
+                print(f"Error fetching current accident values data: {e}")
+                return jsonify({'error': 'An error occurred'}), 500
+    finally:
+        db_info_package.close()
+
 
 @app.route('/block_contact_n_data/<table>/<from_timestamp>/<to_timestamp>', methods=['GET'])
 def get_block_contact_n_data(table, from_timestamp, to_timestamp):
@@ -587,29 +649,124 @@ def get_block_contact_n_data(table, from_timestamp, to_timestamp):
     finally:
         db_info_package.close()
 
-@app.route('/number_of_change_data/<table>/<from_timestamp>/<to_timestamp>', methods=['GET'])
-def get_number_of_change_data(table, from_timestamp, to_timestamp):
+@app.route('/block_contact_data/<table>/<from_timestamp>/<to_timestamp>', methods=['GET'])
+def get_block_contact_data(table, from_timestamp, to_timestamp):
     db_info_package = info_package_db_pool.get_connection()
     try:
         if table and from_timestamp and to_timestamp:
             formatted_from_timestamp = datetime.fromisoformat(from_timestamp[:-1]).replace(tzinfo=timezone.utc)
             formatted_to_timestamp = datetime.fromisoformat(to_timestamp[:-1]).replace(tzinfo=timezone.utc)
 
-            query = f"SELECT Timestamp, NumberOfChange FROM `{table}` WHERE Timestamp >= %s AND Timestamp <= %s ORDER BY Timestamp ASC"
+            query = f"SELECT Timestamp, BlokKontakt FROM `{table}` WHERE Timestamp >= %s AND Timestamp <= %s ORDER BY Timestamp ASC"
 
             try:
                 with db_info_package.cursor(dictionary=True) as cursor:
                     cursor.execute(query, (formatted_from_timestamp, formatted_to_timestamp))
-                    number_of_change_data = cursor.fetchall()
+                    block_contact_data = cursor.fetchall()
 
-                response = jsonify({'numberOfChangeData': number_of_change_data})
+                response = jsonify({'blockContactData': block_contact_data})
                 return response
             except Exception as e:
-                print(f"Error fetching NumberOfChange data: {e}")
+                print(f"Error fetching BlockKontakt data: {e}")
                 return jsonify({'error': 'An error occurred'}), 500
     finally:
         db_info_package.close()
 
+@app.route('/conversion_period_data/<table>/<from_timestamp>/<to_timestamp>', methods=['GET'])
+def get_conversion_period_data(table, from_timestamp, to_timestamp):
+    db_info_package = info_package_db_pool.get_connection()
+    try:
+        if table and from_timestamp and to_timestamp:
+            formatted_from_timestamp = datetime.fromisoformat(from_timestamp[:-1]).replace(tzinfo=timezone.utc)
+            formatted_to_timestamp = datetime.fromisoformat(to_timestamp[:-1]).replace(tzinfo=timezone.utc)
+
+            query = f"SELECT Timestamp, Conversion_Period FROM `{table}` WHERE Timestamp >= %s AND Timestamp <= %s ORDER BY Timestamp ASC"
+
+            try:
+                with db_info_package.cursor(dictionary=True) as cursor:
+                    cursor.execute(query, (formatted_from_timestamp, formatted_to_timestamp))
+                    conversion_period_data = cursor.fetchall()
+
+                response = jsonify({'conversionPeriodData': conversion_period_data})
+                return response
+            except Exception as e:
+                print(f"Error fetching Conversion_Period data: {e}")
+                return jsonify({'error': 'An error occurred'}), 500
+    finally:
+        db_info_package.close()
+
+@app.route('/num_of_control_data/<table>/<from_timestamp>/<to_timestamp>', methods=['GET'])
+def get_num_of_control_data(table, from_timestamp, to_timestamp):
+    db_info_package = info_package_db_pool.get_connection()
+    try:
+        if table and from_timestamp and to_timestamp:
+            formatted_from_timestamp = datetime.fromisoformat(from_timestamp[:-1]).replace(tzinfo=timezone.utc)
+            formatted_to_timestamp = datetime.fromisoformat(to_timestamp[:-1]).replace(tzinfo=timezone.utc)
+
+            query = f"SELECT Timestamp, NumOfControl FROM `{table}` WHERE Timestamp >= %s AND Timestamp <= %s ORDER BY Timestamp ASC"
+
+            try:
+                with db_info_package.cursor(dictionary=True) as cursor:
+                    cursor.execute(query, (formatted_from_timestamp, formatted_to_timestamp))
+                    num_of_control_data = cursor.fetchall()
+
+                response = jsonify({'numOfControlData': num_of_control_data})
+                return response
+            except Exception as e:
+                print(f"Error fetching NumOfControl data: {e}")
+                return jsonify({'error': 'An error occurred'}), 500
+    finally:
+        db_info_package.close()
+
+@app.route('/kurbel_data/<table>/<from_timestamp>/<to_timestamp>', methods=['GET'])
+def get_kurbel_data(table, from_timestamp, to_timestamp):
+    db_info_package = info_package_db_pool.get_connection()
+    try:
+        if table and from_timestamp and to_timestamp:
+            formatted_from_timestamp = datetime.fromisoformat(from_timestamp[:-1]).replace(tzinfo=timezone.utc)
+            formatted_to_timestamp = datetime.fromisoformat(to_timestamp[:-1]).replace(tzinfo=timezone.utc)
+
+            query = f"SELECT Timestamp, Kurbel FROM `{table}` WHERE Timestamp >= %s AND Timestamp <= %s ORDER BY Timestamp ASC"
+
+            try:
+                with db_info_package.cursor(dictionary=True) as cursor:
+                    cursor.execute(query, (formatted_from_timestamp, formatted_to_timestamp))
+                    kurbel_data = cursor.fetchall()
+
+                response = jsonify({'kurbelData': kurbel_data})
+                return response
+            except Exception as e:
+                print(f"Error fetching Kurbel data: {e}")
+                return jsonify({'error': 'An error occurred'}), 500
+    finally:
+        db_info_package.close()
+
+@app.route('/sobs_lost_of_control_data/<table>/<from_timestamp>/<to_timestamp>', methods=['GET'])
+def get_sobs_lost_of_control_data(table, from_timestamp, to_timestamp):
+    db_info_package = info_package_db_pool.get_connection()
+    try:
+        if table and from_timestamp and to_timestamp:
+            formatted_from_timestamp = datetime.fromisoformat(from_timestamp[:-1]).replace(tzinfo=timezone.utc)
+            formatted_to_timestamp = datetime.fromisoformat(to_timestamp[:-1]).replace(tzinfo=timezone.utc)
+
+            query = f"SELECT Timestamp, SOBS_Lost_Of_Control FROM `{table}` WHERE Timestamp >= %s AND Timestamp <= %s ORDER BY Timestamp ASC"
+
+            try:
+                with db_info_package.cursor(dictionary=True) as cursor:
+                    cursor.execute(query, (formatted_from_timestamp, formatted_to_timestamp))
+                    sobs_lost_of_control_data = cursor.fetchall()
+
+                response = jsonify({'sobsLostOfControlData': sobs_lost_of_control_data})
+                return response
+            except Exception as e:
+                print(f"Error fetching sobsLostOfControlData data: {e}")
+                return jsonify({'error': 'An error occurred'}), 500
+    finally:
+        db_info_package.close()
+
+
+
+#================================================================================================================================================================================
 @app.route('/store_note', methods=['POST'])
 def store_note():
     db_info_package = user_note_db_pool.get_connection()

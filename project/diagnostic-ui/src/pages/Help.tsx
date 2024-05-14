@@ -22,7 +22,7 @@ const Help = () => {
                 </div>
                 <div className="text-2xl font-bold mt-10">Proqram haqqında</div>
                 <div className="flex items-center">
-                  <span className="text-xs">Daha ətraflı</span>
+                  <span className="text-2sm">Daha ətraflı</span>
                   <FaLongArrowAltRight className="ml-1" />
                 </div>
               </div>
