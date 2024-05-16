@@ -50,7 +50,8 @@ user_note_db_pool.add = types.MethodType(add_connection, user_note_db_pool)
 info_package_db_pool.add = types.MethodType(add_connection, info_package_db_pool)
 
 
-#================================================================================================================================================================================
+#=================================================================================== Login (Login.tsx) =============================================================================================
+
 @app.route('/login', methods=['POST'])
 def login():
     db_user = user_db_pool.get_connection()
@@ -81,6 +82,12 @@ def login():
     finally:
         db_user.close()
         db_info_package.close()
+
+#============================================================================== Login (Login.tsx) ===================================================================================
+
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#=========================================================================== Əsas səhifə (HomePage.tsx) =============================================================================
 
 def check_alarms():
     db_info_package = info_package_db_pool.get_connection()
@@ -387,7 +394,11 @@ def get_alarms():
         db_info_package.close()
 
 
-#================================================================================================================================================================================
+#=========================================================================== Əsas səhifə (HomePage.tsx) =============================================================================
+
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#===================================================================== Cari Analiz (CurrentAnalysis.tsx page) =======================================================================
 @app.route('/table_names', methods=['GET'])
 def get_table_names():
     db_info_package = info_package_db_pool.get_connection()
@@ -474,7 +485,11 @@ def get_table_data():
         db_info_package.close()
 
 
-#================================================================================================================================================================================
+#===================================================================== Cari Analiz (CurrentAnalysis.tsx page) =======================================================================
+
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#================================================================== Interval Analiz (IntervalAnalysis.tsx page) =====================================================================
 @app.route('/table_numbers', methods=['GET'])
 def get_table_numbers():
     db_info_package = info_package_db_pool.get_connection()
@@ -763,13 +778,14 @@ def get_sobs_lost_of_control_data(table, from_timestamp, to_timestamp):
                 return jsonify({'error': 'An error occurred'}), 500
     finally:
         db_info_package.close()
+#================================================================== Interval Analiz (IntervalAnalysis.tsx page) =====================================================================
 
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
-#================================================================================================================================================================================
+#============================================================================= Qeyd (Note.tsx page) =================================================================================
 @app.route('/store_note', methods=['POST'])
 def store_note():
-    db_info_package = user_note_db_pool.get_connection()
+    db_note = user_note_db_pool.get_connection()
 
     try:
         data = request.json
@@ -777,30 +793,58 @@ def store_note():
         user_full_name = data.get('userFullName')
         note = data.get('note')
 
-        query = "INSERT INTO yd_note_workers (Sahe, FullName, Note) VALUES (%s, %s, %s)"
-        with db_info_package.cursor() as cursor:
+        query = "INSERT INTO yd_note_workers (Sahe, FullName, Note, timestamp) VALUES (%s, %s, %s, NOW())"
+        with db_note.cursor() as cursor:
             cursor.execute(query, (sahe, user_full_name, note))
-        db_info_package.commit()
+        db_note.commit()
 
         response = jsonify({'message': 'Note stored successfully'})
         return response
     finally:
-        db_info_package.close()
-       
+        db_note.close()
 
 @app.route('/get_notes', methods=['GET'])
 def get_notes():
-    db_info_package = info_package_db_pool.get_connection()
+    db_note = user_note_db_pool.get_connection()
+    db_user = user_db_pool.get_connection()
 
     try:
-        with db_info_package.cursor(dictionary=True) as cursor:
-            cursor.execute("SELECT * FROM yd_note_workers")
+        query_notes = """
+            SELECT Sahe, FullName, Note, timestamp
+            FROM yd_note_workers
+            ORDER BY timestamp DESC
+        """
+        with db_note.cursor(dictionary=True) as cursor:
+            cursor.execute(query_notes)
             notes = cursor.fetchall()
+
+        full_names = tuple(note['FullName'] for note in notes)
+        if full_names:
+            query_users = f"""
+                SELECT fullName, Vezife
+                FROM users
+                WHERE fullName IN ({','.join(['%s'] * len(full_names))})
+            """
+            with db_user.cursor(dictionary=True) as cursor:
+                cursor.execute(query_users, full_names)
+                users = cursor.fetchall()
+                user_dict = {user['fullName']: user['Vezife'] for user in users}
+        else:
+            user_dict = {}
+
+        for note in notes:
+            note['Vezife'] = user_dict.get(note['FullName'], None)
 
         response = jsonify({'notes': notes})
         return response
     finally:
-        db_info_package.close()
+        db_note.close()
+        db_user.close()
+
+#============================================================================= Qeyd (Note.tsx page) =================================================================================
+
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 if __name__ == '__main__':
     app.run(debug=True, threaded=True, host='0.0.0.0', port=5000)

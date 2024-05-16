@@ -17,19 +17,9 @@ class DataCollector:
         self.is_storing = False
         self.stop_event = threading.Event()
 
-    def start_storing(self):
-        ports = list(list_ports.comports())
-        if len(ports) == 0:
-            messagebox.showerror("Error", "No serial ports found. Make sure the microcontroller is connected.")
-            return
-        port = ports[0].device
+        self.initialize_db_connection()
 
-        try:
-            self.serial_port = serial.Serial(port=port, baudrate=9600, timeout=1)
-        except serial.SerialException as e:
-            messagebox.showerror("Error", f"Error opening serial port: {e}")
-            return
-
+    def initialize_db_connection(self):
         try:
             self.db_connection = mysql.connector.connect(
                 host='localhost',
@@ -38,18 +28,31 @@ class DataCollector:
                 database='yd_information_package'
             )
             self.cursor = self.db_connection.cursor()
-
-            print("Start storing information to the database.")
-            self.is_storing = True
-            self.stop_event.clear()
-            self.start_storing_thread()
         except mysql.connector.Error as err:
             if err.errno == mysql.connector.errorcode.ER_ACCESS_DENIED_ERROR:
-                messagebox.showerror("Error", "Access denied. Please check your MySQL username and password.")
+                messagebox.showerror("Xəta", "Giriş qadağandır. Zəhmət olmasa MySQL istifadəçi adınızı və parolunuzu yoxlayın.")
             elif err.errno == mysql.connector.errorcode.ER_BAD_DB_ERROR:
-                messagebox.showerror("Error", "Database does not exist. Please create the database first.")
+                messagebox.showerror("Xəta", "Verilənlər bazası mövcud deyil. Zəhmət olmasa əvvəlcə verilənlər bazası yaradın.")
             else:
-                messagebox.showerror("Error", f"Error connecting to MySQL: {err}")
+                messagebox.showerror("Xəta", f"MySQL-ə qoşulma xətası: {err}")
+
+    def start_storing(self):
+        ports = list(list_ports.comports())
+        if len(ports) == 0:
+            messagebox.showerror("Xəta!", "Heç bir serial port tapılmadı. Mikrokontrollerin qoşulduğundan əmin olun.")
+            return
+        port = ports[0].device
+
+        try:
+            self.serial_port = serial.Serial(port=port, baudrate=9600, timeout=1)
+        except serial.SerialException as e:
+            messagebox.showerror("Xəta!", f"Serial portun açılma xətası: {e}")
+            return
+
+        print("Start storing information to the database.")
+        self.is_storing = True
+        self.stop_event.clear()
+        self.start_storing_thread()
 
     def stop_storing(self):
         self.is_storing = False
@@ -57,10 +60,6 @@ class DataCollector:
 
         if self.serial_port and self.serial_port.is_open:
             self.serial_port.close()
-
-        if self.db_connection and self.db_connection.is_connected():
-            self.cursor.close()
-            self.db_connection.close()
 
         print("Stop storing information.")
 
@@ -80,7 +79,7 @@ class DataCollector:
                 package_values = package.split('/')
 
                 if len(package_values) != 31:
-                    messagebox.showwarning("Warning", f"Invalid package format: {package}")
+                    messagebox.showwarning("Xəbərdarlıq", f"Yanlış paket formatı: {package}")
                     continue
 
                 try:
@@ -101,9 +100,9 @@ class DataCollector:
 
                     print(f"Package stored successfully in {table_number}.")
                 except ValueError as e:
-                    messagebox.showwarning("Warning", f"Error processing package: {e}")
+                    messagebox.showwarning("Xəbərdarlıq", f"Paketin işlənməsi xətası: {e}")
             except serial.SerialException as e:
-                messagebox.showerror("Error", f"Error reading from serial port: {e}")
+                messagebox.showerror("Xəta", f"Serial portundan oxunma xətası: {e}")
                 break
 
 def start_collecting():
@@ -120,7 +119,7 @@ def stop_collecting():
 
 def show_tables():
     tables_window = tk.Toplevel(root)
-    tables_window.title("Tables")
+    tables_window.title("Cədvəllər")
     tables_window.geometry("1110x400")
 
     x = 10
@@ -143,9 +142,12 @@ def show_table_data(table_name):
     table_data_window.title(table_name)
     table_data_window.geometry("1300x600")
 
+    table_frame = ttk.Frame(table_data_window)
+    table_frame.pack(fill="both", expand=True)
+
     if data_collector.db_connection is None or data_collector.cursor is None:
         table_data_window.destroy()
-        messagebox.showerror("Error", "Data collection is not started. Please start collecting data first.")
+        messagebox.showerror("Xəta", "Məlumatların toplanmasına başlanmayıb. Zəhmət olmasa əvvəlcə məlumat toplamağa başlayın.")
         return
 
     try:
@@ -157,15 +159,13 @@ def show_table_data(table_name):
 
         column_names = [column[0] for column in cursor.description]
 
-        table_frame = ttk.Frame(table_data_window)
-        table_frame.pack(fill="both", expand=True)
-
         table_tree = ttk.Treeview(table_frame)
         table_tree["columns"] = column_names
         table_tree["show"] = "headings"
 
         for column in column_names:
-            table_tree.column(column, width=60)
+            table_tree.heading(column, text=column)
+            table_tree.column(column, width=100)
 
         for row in table_data:
             table_tree.insert("", "end", values=row)
@@ -178,23 +178,8 @@ def show_table_data(table_name):
 
         table_frame.pack_propagate(0)
     except mysql.connector.Error as err:
-        messagebox.showerror("Error", f"Error retrieving table data: {err}")
+        messagebox.showerror("Xəta", f"Cədvəl məlumatını əldə edərkən xəta baş verdi: {err}")
 
-def show_tables():
-    tables_window = tk.Toplevel(root)
-    tables_window.title("Yol Dəyişdiricilər")
-    tables_window.geometry("1110x400")
-
-    x = 10
-    y = 10
-    for i in range(1, 59):
-        table_name = f"yd_{i}"
-        button = ttk.Button(tables_window, text=table_name, command=lambda name=table_name: show_table_data(name))
-        button.place(x=x, y=y, width=100, height=50)
-        x += 110
-        if i % 10 == 0:
-            x = 10
-            y += 60
 
 def on_enter(e):
     e.widget.state(["pressed", "!disabled"])
@@ -211,7 +196,7 @@ def on_close():
 data_collector = DataCollector()
 
 root = tk.Tk()
-root.title("Serial Port Data Logger")
+root.title("Serial Port Məlumat Qeydiyyatçısı")
 root.geometry("300x250")
 root.protocol("WM_DELETE_WINDOW", on_close)
 
@@ -229,7 +214,7 @@ start_button.pack(pady=10)
 stop_button = ttk.Button(root, text="Stop", command=stop_collecting, style="TButton", state=tk.DISABLED)
 stop_button.pack(pady=10)
 
-show_tables_button = ttk.Button(root, text="Show Tables", command=show_tables, style="TButton")
+show_tables_button = ttk.Button(root, text="Cədvəlləri Göstər", command=show_tables, style="TButton")
 show_tables_button.pack(pady=10)
 
 start_button.bind("<Enter>", on_enter)
