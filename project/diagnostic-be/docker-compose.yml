@@ -1,0 +1,31 @@
+version: "3.8"
+services:
+  db:
+    container_name: diag-db
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_DATABASE: yd_information_package
+      MYSQL_USER: metrosite
+      MYSQL_PASSWORD: metrosite
+      MYSQL_ROOT_PASSWORD: k2Z)EC8/bteD]FDY
+    ports:
+      - "3303:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db/yd_information_package.sql:/docker-entrypoint-initdb.d/yd_information_package.sql
+      - ./db/yd_user_db.sql:/docker-entrypoint-initdb.d/yd_user_db.sql
+      - ./db/yd_note_workers.sql:/docker-entrypoint-initdb.d/yd_note_workers.sql
+  db-admin:
+    container_name: diag-db-admin
+    image: phpmyadmin
+    restart: always
+    environment:
+      - PMA_ARBITRARY=1
+        PMA_PORT=3303
+    ports:
+      - "8034:80"
+
+volumes:
+  db_data:

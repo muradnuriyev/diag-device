@@ -13,7 +13,8 @@ user_db_config = {
     "pool_size": 10,
     "host": "localhost",
     "user": "root",
-    "password": "",
+    "password": "k2Z)EC8/bteD]FDY",
+    "port": 3303,
     "database": "yd_user_db",
     "connect_timeout": 30,
 }
@@ -23,7 +24,8 @@ user_note_db_config = {
     "pool_size": 10,
     "host": "localhost",
     "user": "root",
-    "password": "",
+    "password": "k2Z)EC8/bteD]FDY",
+    "port": 3303,
     "database": "yd_note_workers",
     "connect_timeout": 30,
 }
@@ -33,7 +35,8 @@ info_package_db_config = {
     "pool_size": 10,
     "host": "localhost",
     "user": "root",
-    "password": "",
+    "password": "k2Z)EC8/bteD]FDY",
+    "port": 3303,
     "database": "yd_information_package",
     "connect_timeout": 30,
 }
