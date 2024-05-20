@@ -13,13 +13,18 @@ import {
 } from "recharts";
 import TesdiqButton from "../layouts/AuthLayout/components/TesdiqButton";
 import { useNavigate } from "react-router-dom";
+import DatePicker, { registerLocale } from "react-datepicker";
+import { az } from "date-fns/locale/az";
+
+import "react-datepicker/dist/react-datepicker.css";
 
 const IntervalAnalysisPage = () => {
+  registerLocale("az", az);
   const navigate = useNavigate();
   const [tableNumbers, setTableNumbers] = useState([]);
   const [selectedTable, setSelectedTable] = useState("");
-  const [fromTimestamp, setFromTimestamp] = useState("");
-  const [toTimestamp, setToTimestamp] = useState("");
+  const [fromTimestamp, setFromTimestamp] = useState(new Date());
+  const [toTimestamp, setToTimestamp] = useState(new Date());
   const [timestamps, setTimestamps] = useState([]);
   const [VofDeviceData, setVofDeviceData] = useState([]);
   const [temperatureData, setTemperatureData] = useState([]);
@@ -343,8 +348,8 @@ const IntervalAnalysisPage = () => {
   useEffect(() => {
     if (selectedTable) {
       setShowChart(false);
-      setFromTimestamp("");
-      setToTimestamp("");
+      setFromTimestamp(new Date());
+      setToTimestamp(new Date());
       setTableChanged(false);
 
       fetch(`http://localhost:5000/timestamps/${selectedTable}`, {
@@ -392,7 +397,17 @@ const IntervalAnalysisPage = () => {
             </select>
 
             <label className="ml-7 mr-2 text-xl font-semibold">Tarix:</label>
-            <select
+            <DatePicker
+              onChange={(date) => setFromTimestamp(date ? date : new Date())}
+              selected={fromTimestamp}
+              showTimeSelect
+              timeIntervals={1}
+              timeFormat="p"
+              dateFormat="dd.MM.yyyy HH:mm"
+              locale="az"
+            />
+
+            {/* <select
               value={fromTimestamp}
               onChange={(event) => setFromTimestamp(event.target.value)}
               className="px-4 py-2 border border-main-blue rounded-lg"
@@ -403,12 +418,23 @@ const IntervalAnalysisPage = () => {
                   {timestamp}
                 </option>
               ))}
-            </select>
+            </select> */}
 
             <label className=" ml-2 mr-2 text-xl font-semibold">
               <AiOutlineMinus />
             </label>
-            <select
+
+            <DatePicker
+              onChange={(date) => setToTimestamp(date ? date : new Date())}
+              selected={toTimestamp}
+              showTimeSelect
+              timeIntervals={1}
+              timeFormat="p"
+              dateFormat="dd.MM.yyyy HH:mm"
+              locale="az"
+            />
+
+            {/* <select
               value={toTimestamp}
               onChange={(event) => setToTimestamp(event.target.value)}
               className="px-4 py-2 border border-main-blue rounded-lg"
@@ -419,7 +445,7 @@ const IntervalAnalysisPage = () => {
                   {timestamp}
                 </option>
               ))}
-            </select>
+            </select> */}
           </div>
 
           <div className=" flex mr-4">
