@@ -3,7 +3,7 @@ import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from datetime import datetime, timezone, timedelta
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager, create_access_token
 import mysql.connector.pooling
 import types
 
@@ -13,6 +13,7 @@ app.config.from_prefixed_env()
 load_dotenv()
 CORS(app, origins=os.getenv("FRONTEND_URL"))
 
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
 jwt=JWTManager()
 jwt.init_app(app)
 
@@ -85,7 +86,15 @@ def login():
             sahe_result = cursor.fetchone()
             user_info['sahe'] = sahe_result['Sahe'] if sahe_result else None
 
-            response = jsonify({'message': 'Login successful', 'user_info': user_info})
+            print(user_info['username'])
+
+            access_token = create_access_token(identity=user_info['username'])
+
+            response = jsonify({
+                'message': 'Login successful', 
+                'user_info': user_info, 
+                'access_token': access_token
+            })
             return response
         else:
             response = jsonify({'message': 'Invalid login credentials'})
