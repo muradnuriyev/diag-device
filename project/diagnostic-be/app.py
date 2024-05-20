@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from datetime import datetime, timezone, timedelta
@@ -6,15 +8,17 @@ import types
 
 
 app = Flask(__name__)
-CORS(app, origins="http://localhost:5173")
+app.config.from_prefixed_env()
+load_dotenv()
+CORS(app, origins=os.getenv("FRONTEND_URL"))
 
 user_db_config = {
     "pool_name": "user_db_pool",
     "pool_size": 10,
-    "host": "localhost",
-    "user": "root",
-    "password": "k2Z)EC8/bteD]FDY",
-    "port": 3303,
+    "host": os.getenv("DATABASE_HOST"),
+    "user": os.getenv("DATABASE_USER"),
+    "password": os.getenv("DATABASE_PASSWORD"),
+    "port": os.getenv("DATABASE_PORT"),
     "database": "yd_user_db",
     "connect_timeout": 30,
 }
@@ -22,10 +26,10 @@ user_db_config = {
 user_note_db_config = {
     "pool_name": "user_note_db_pool",
     "pool_size": 10,
-    "host": "localhost",
-    "user": "root",
-    "password": "k2Z)EC8/bteD]FDY",
-    "port": 3303,
+    "host": os.getenv("DATABASE_HOST"),
+    "user": os.getenv("DATABASE_USER"),
+    "password": os.getenv("DATABASE_PASSWORD"),
+    "port": os.getenv("DATABASE_PORT"),
     "database": "yd_note_workers",
     "connect_timeout": 30,
 }
@@ -33,10 +37,10 @@ user_note_db_config = {
 info_package_db_config = {
     "pool_name": "info_package_db_pool",
     "pool_size": 10,
-    "host": "localhost",
-    "user": "root",
-    "password": "k2Z)EC8/bteD]FDY",
-    "port": 3303,
+    "host": os.getenv("DATABASE_HOST"),
+    "user": os.getenv("DATABASE_USER"),
+    "password": os.getenv("DATABASE_PASSWORD"),
+    "port": os.getenv("DATABASE_PORT"),
     "database": "yd_information_package",
     "connect_timeout": 30,
 }
