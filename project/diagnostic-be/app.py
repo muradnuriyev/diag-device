@@ -122,7 +122,7 @@ def check_alarms():
             records = cursor.fetchall()
 
             for record in records:
-                timestamp = record['Timestamp']
+                timestamp = record['Timestamp'].strftime("%d.%m.%Y, %H:%M:%S")
 
                 v_of_device = record.get('V_of_Device', None)
                 right_turn = record.get('RightTurn', None)
@@ -472,7 +472,7 @@ def get_table_data():
                 numOfTurn = record.get('NumOfTurn')
                 current_values = "  /  ".join(str(record.get(f"CurrentValue{i}")) for i in range(1, 11))
                 block_kontakt = "Açıq" if record.get('BlokKontakt') == 1 else "Bağlı"
-                timestamp = record.get("Timestamp")
+                timestamp = record.get("Timestamp").strftime("%d.%m.%Y, %H:%M:%S")
                 
                 
                 table_data = {
@@ -536,6 +536,8 @@ def get_timestamps(table_number):
                     query = f"SELECT Timestamp FROM `{table_name}` ORDER BY Timestamp ASC"
                     cursor.execute(query)
                     timestamps = [record['Timestamp'] for record in cursor.fetchall()]
+                    for d in timestamps:
+                        d = d.strftime("%d.%m.%Y, %H:%M:%S")
 
                 response = jsonify({'timestamps': timestamps})
                 return response
@@ -564,6 +566,9 @@ def get_v_of_device_data(table, from_timestamp, to_timestamp):
                 with db_info_package.cursor(dictionary=True) as cursor:
                     cursor.execute(query, (formatted_from_timestamp, formatted_to_timestamp))
                     v_of_device_data = cursor.fetchall()
+                    for ts in v_of_device_data:
+                        ts['Timestamp'] = ts['Timestamp'].strftime("%d.%m.%Y, %H:%M:%S")
+                        
 
                 response = jsonify({'VofDeviceData': v_of_device_data})
                 return response
@@ -588,6 +593,8 @@ def get_temperature_data(table, from_timestamp, to_timestamp):
                 with db_info_package.cursor(dictionary=True) as cursor:
                     cursor.execute(query, (formatted_from_timestamp, formatted_to_timestamp))
                     temperature_data = cursor.fetchall()
+                    for ts in temperature_data:
+                        ts['Timestamp'] = ts['Timestamp'].strftime("%d.%m.%Y, %H:%M:%S")
 
                 response = jsonify({'temperatureData': temperature_data})
                 return response
@@ -613,6 +620,9 @@ def get_current_values_data(table, from_timestamp, to_timestamp):
                     cursor.execute(query, (formatted_from_timestamp, formatted_to_timestamp))
                     current_values_data = cursor.fetchall()
 
+                    for ts in current_values_data:
+                        ts['Timestamp'] = ts['Timestamp'].strftime("%d.%m.%Y, %H:%M:%S")
+
                 response = jsonify({'currentValuesData': current_values_data})
                 return response
             except Exception as e:
@@ -637,6 +647,9 @@ def get_current_accident_values_data(table, from_timestamp, to_timestamp):
                     cursor.execute(query, (formatted_from_timestamp, formatted_to_timestamp))
                     current_accident_values_data = cursor.fetchall()
 
+                    for ts in current_accident_values_data:
+                        ts['Timestamp'] = ts['Timestamp'].strftime("%d.%m.%Y, %H:%M:%S")
+
                 response = jsonify({'currentAccidentValuesData': current_accident_values_data})
                 return response
             except Exception as e:
@@ -660,6 +673,9 @@ def get_u_all_data(table, from_timestamp, to_timestamp):
                 with db_info_package.cursor(dictionary=True) as cursor:
                     cursor.execute(query, (formatted_from_timestamp, formatted_to_timestamp))
                     u_all_data = cursor.fetchall()
+
+                    for ts in u_all_data:
+                        ts['Timestamp'] = ts['Timestamp'].strftime("%d.%m.%Y, %H:%M:%S")
 
                 response = jsonify({'uAllData': u_all_data})
                 return response
@@ -686,6 +702,9 @@ def get_block_contact_n_data(table, from_timestamp, to_timestamp):
                     cursor.execute(query, (formatted_from_timestamp, formatted_to_timestamp))
                     block_contact_n_data = cursor.fetchall()
 
+                    for ts in block_contact_n_data:
+                        ts['Timestamp'] = ts['Timestamp'].strftime("%d.%m.%Y, %H:%M:%S")
+
                 response = jsonify({'blockContactNData': block_contact_n_data})
                 return response
             except Exception as e:
@@ -709,6 +728,9 @@ def get_block_contact_data(table, from_timestamp, to_timestamp):
                 with db_info_package.cursor(dictionary=True) as cursor:
                     cursor.execute(query, (formatted_from_timestamp, formatted_to_timestamp))
                     block_contact_data = cursor.fetchall()
+
+                    for ts in block_contact_data:
+                        ts['Timestamp'] = ts['Timestamp'].strftime("%d.%m.%Y, %H:%M:%S")
 
                 response = jsonify({'blockContactData': block_contact_data})
                 return response
@@ -734,6 +756,9 @@ def get_conversion_period_data(table, from_timestamp, to_timestamp):
                     cursor.execute(query, (formatted_from_timestamp, formatted_to_timestamp))
                     conversion_period_data = cursor.fetchall()
 
+                    for ts in conversion_period_data:
+                        ts['Timestamp'] = ts['Timestamp'].strftime("%d.%m.%Y, %H:%M:%S")
+
                 response = jsonify({'conversionPeriodData': conversion_period_data})
                 return response
             except Exception as e:
@@ -757,6 +782,9 @@ def get_num_of_control_data(table, from_timestamp, to_timestamp):
                 with db_info_package.cursor(dictionary=True) as cursor:
                     cursor.execute(query, (formatted_from_timestamp, formatted_to_timestamp))
                     num_of_control_data = cursor.fetchall()
+
+                    for ts in num_of_control_data:
+                        ts['Timestamp'] = ts['Timestamp'].strftime("%d.%m.%Y, %H:%M:%S")
 
                 response = jsonify({'numOfControlData': num_of_control_data})
                 return response
@@ -782,6 +810,9 @@ def get_kurbel_data(table, from_timestamp, to_timestamp):
                     cursor.execute(query, (formatted_from_timestamp, formatted_to_timestamp))
                     kurbel_data = cursor.fetchall()
 
+                    for ts in kurbel_data:
+                        ts['Timestamp'] = ts['Timestamp'].strftime("%d.%m.%Y, %H:%M:%S")
+
                 response = jsonify({'kurbelData': kurbel_data})
                 return response
             except Exception as e:
@@ -805,6 +836,9 @@ def get_sobs_lost_of_control_data(table, from_timestamp, to_timestamp):
                 with db_info_package.cursor(dictionary=True) as cursor:
                     cursor.execute(query, (formatted_from_timestamp, formatted_to_timestamp))
                     sobs_lost_of_control_data = cursor.fetchall()
+
+                    for ts in sobs_lost_of_control_data:
+                        ts['Timestamp'] = ts['Timestamp'].strftime("%d.%m.%Y, %H:%M:%S")
 
                 response = jsonify({'sobsLostOfControlData': sobs_lost_of_control_data})
                 return response
