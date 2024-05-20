@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { AiOutlineClockCircle } from 'react-icons/ai'
 
 const CurrentTime = () => {
-    const [time, setTime] = useState(new Date().toLocaleTimeString());
+    const [time, setTime] = useState(new Date().toLocaleTimeString("az"));
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setTime(new Date().toLocaleTimeString());
+            setTime(new Date().toLocaleTimeString("az"));
         }, 1000);
         return () => clearInterval(interval);
     }, []);

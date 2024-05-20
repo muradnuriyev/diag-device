@@ -1,28 +1,28 @@
 import { useEffect, useState } from "react";
-import { LuCalendarDays } from "react-icons/lu"
+import { LuCalendarDays } from "react-icons/lu";
+import { format } from "date-fns";
+import { az } from "date-fns/locale/az";
 
 const CurrentDate = () => {
-    const getDate = () => new Date()
-        .toLocaleDateString("en-GB", { day: '2-digit', month: '2-digit', year: 'numeric' })
-        .replace(/\//g, '.')
+  const now = new Date();
+  const getDate = () => format(now, "d MMM yyyy, EEEEE", { locale: az });
+  const [date, setDate] = useState(getDate());
 
-    const [date, setDate] = useState(getDate());
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDate(getDate());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setDate(getDate());
-        }, 1000);
-        return () => clearInterval(interval);
-    }, []);
-
-    return (
-        <div className="flex items-center">
-            <p className="text-4xl">
-                <LuCalendarDays />
-            </p>
-            <p className="text-lg ml-2">{date}</p>
-        </div>
-    );
-}
+  return (
+    <div className="flex items-center">
+      <p className="text-4xl">
+        <LuCalendarDays />
+      </p>
+      <p className="text-lg ml-2">{date}</p>
+    </div>
+  );
+};
 
 export default CurrentDate;
