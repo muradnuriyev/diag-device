@@ -3,6 +3,7 @@ import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from datetime import datetime, timezone, timedelta
+from flask_jwt_extended import JWTManager
 import mysql.connector.pooling
 import types
 
@@ -11,6 +12,9 @@ app = Flask(__name__)
 app.config.from_prefixed_env()
 load_dotenv()
 CORS(app, origins=os.getenv("FRONTEND_URL"))
+
+jwt=JWTManager()
+jwt.init_app(app)
 
 user_db_config = {
     "pool_name": "user_db_pool",
