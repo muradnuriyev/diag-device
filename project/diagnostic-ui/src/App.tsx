@@ -15,10 +15,16 @@ import CurrentAnalysisPage from "@pages/CurrentAnalysis";
 import IntervalAnalysisPage from "@pages/IntervalAnalysis";
 import Logout from "@pages/Logout.tsx";
 
+const access_token = localStorage.getItem("access_token");
+
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to="login" />,
+    element: access_token ? (
+      <Navigate to="auth/home" />
+    ) : (
+      <Navigate to="login" />
+    ),
   },
   {
     path: "login",
