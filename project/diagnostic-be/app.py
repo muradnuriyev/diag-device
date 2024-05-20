@@ -86,8 +86,6 @@ def login():
             sahe_result = cursor.fetchone()
             user_info['sahe'] = sahe_result['Sahe'] if sahe_result else None
 
-            print(user_info['username'])
-
             access_token = create_access_token(identity=user_info['username'])
 
             response = jsonify({
