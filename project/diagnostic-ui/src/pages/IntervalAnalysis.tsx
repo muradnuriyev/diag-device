@@ -405,6 +405,7 @@ const IntervalAnalysisPage = () => {
               timeFormat="p"
               dateFormat="dd.MM.yyyy HH:mm"
               locale="az"
+              className="px-4 py-2 border border-main-blue rounded-lg"
             />
 
             {/* <select
@@ -432,6 +433,7 @@ const IntervalAnalysisPage = () => {
               timeFormat="p"
               dateFormat="dd.MM.yyyy HH:mm"
               locale="az"
+              className="px-4 py-2 border border-main-blue rounded-lg"
             />
 
             {/* <select
