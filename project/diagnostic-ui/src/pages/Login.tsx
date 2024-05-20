@@ -21,8 +21,10 @@ const Login: FC = memo(() => {
       if (response.data.message === "Login successful") {
         const userFullName = response.data.user_info.fullName;
         const sahe = response.data.user_info.sahe; // Fetched "Sahe" value
+        const access_token = response.data.access_token;
         localStorage.setItem("userFullName", userFullName);
         localStorage.setItem("sahe", sahe);
+        localStorage.setItem("access_token", access_token);
         navigate("/auth/home");
       } else {
         setUsername("");

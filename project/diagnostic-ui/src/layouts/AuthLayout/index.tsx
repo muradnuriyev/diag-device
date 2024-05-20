@@ -1,5 +1,5 @@
-import { FC } from "react";
-import { Link, Outlet, useLocation, } from "react-router-dom";
+import { FC, useEffect } from "react";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import logo from "@assets/logo.png";
 import { AiFillHome } from "react-icons/ai";
 import { FaSearchengin } from "react-icons/fa";
@@ -15,11 +15,16 @@ import { BsPersonCircle } from "react-icons/bs";
 import CurrentTime from "./components/CurrentTime";
 import CurrentDate from "./components/CurrentDate";
 
-
-
 const AuthLayout: FC = () => {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const userFullName = localStorage.getItem("userFullName");
+
+  useEffect(() => {
+    if (!userFullName) {
+      navigate("/login");
+    }
+  }, [userFullName]);
 
   const menuButtons = [
     { icon: <AiFillHome />, label: "Əsas səhifə", path: "/auth/home" },
@@ -28,8 +33,16 @@ const AuthLayout: FC = () => {
       label: "Cari analiz",
       path: "/auth/current-analysis",
     },
-    { icon: < IoAnalyticsSharp/>, label: "Interval Analiz", path: "/auth/interval-analysis"},
-    { icon: <IoStatsChart />, label: "İQ-3 jurnalı", path: "/auth/iq3-journal" },
+    {
+      icon: <IoAnalyticsSharp />,
+      label: "Interval Analiz",
+      path: "/auth/interval-analysis",
+    },
+    {
+      icon: <IoStatsChart />,
+      label: "İQ-3 jurnalı",
+      path: "/auth/iq3-journal",
+    },
     {
       icon: <BsFillJournalBookmarkFill />,
       label: "Tex.pros.planı",
@@ -38,7 +51,7 @@ const AuthLayout: FC = () => {
     { icon: <VscHistory />, label: "Tarixçə", path: "/auth/history" },
     { icon: <SlNote />, label: "Qeyd", path: "/auth/note" },
     { icon: <BsFillQuestionCircleFill />, label: "Kömək", path: "/auth/help" },
-    { icon: <FaSignOutAlt />, label: "Çıxış", path: "/auth/logout", }
+    { icon: <FaSignOutAlt />, label: "Çıxış", path: "/auth/logout" },
   ];
 
   return (
@@ -85,10 +98,12 @@ const AuthLayout: FC = () => {
           </div>
           <div className="flex items-center mr-10 ml-10">
             <div className="text-3xl mr-3">
-              <BsPersonCircle/> 
-            </div>           
+              <BsPersonCircle />
+            </div>
             {userFullName && (
-              <p className="text-2xl font-bold text-gray-800 mr-10">{userFullName}</p>
+              <p className="text-2xl font-bold text-gray-800 mr-10">
+                {userFullName}
+              </p>
             )}
           </div>
         </div>
@@ -97,7 +112,6 @@ const AuthLayout: FC = () => {
         </div>
       </div>
     </div>
-    
   );
 };
 

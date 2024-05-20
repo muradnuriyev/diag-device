@@ -13,6 +13,7 @@ import TechnicalProsPlanPage from "@pages/TechnicalProsPlan";
 import IQ3JournalPage from "@pages/IQ3Journal";
 import CurrentAnalysisPage from "@pages/CurrentAnalysis";
 import IntervalAnalysisPage from "@pages/IntervalAnalysis";
+import Logout from "@pages/Logout.tsx";
 
 const router = createBrowserRouter([
   {
@@ -61,7 +62,7 @@ const router = createBrowserRouter([
       },
       {
         path: "logout",
-        element: <Navigate to="/login" />,
+        element: <Logout />,
       },
     ],
   },
