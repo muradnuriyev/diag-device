@@ -5,6 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import notificationSound from "/src/sounds/notification.mp3";
+import { useNavigate } from "react-router-dom";
 
 interface Alarm {
   Conversion_Period_Difference: number;
@@ -39,15 +40,20 @@ interface Alarm {
 }
 
 const HomePage = () => {
+  const navigate = useNavigate();
   const [alarms, setAlarms] = useState<Alarm[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const alarmsPerPage = 7;
   const totalPages = Math.ceil(alarms.length / alarmsPerPage);
+  const access_token = localStorage.getItem("access_token");
 
   useEffect(() => {
     const interval = setInterval(() => {
-      axios.get("http://localhost:5000/alarms")
+      axios
+        .get("http://localhost:5000/alarms", {
+          headers: { Authorization: `Bearer ${access_token}` },
+        })
         .then((response) => {
           console.log("Response data:", response.data);
           if (response.data.length > alarms.length) {
@@ -56,17 +62,24 @@ const HomePage = () => {
             setLoading(false);
             notifyAlarm(newAlarm);
             {
-              document.documentElement.style.setProperty('--warning-color', '#FF0000');
-              playNotificationSound(); 
+              document.documentElement.style.setProperty(
+                "--warning-color",
+                "#FF0000"
+              );
+              playNotificationSound();
             }
-            
-            console.log('currentPage:', currentPage);
-            console.log('alarmsPerPage:', alarmsPerPage);
-            console.log('totalAlarms:', alarms.length);
+
+            console.log("currentPage:", currentPage);
+            console.log("alarmsPerPage:", alarmsPerPage);
+            console.log("totalAlarms:", alarms.length);
           }
         })
         .catch((error) => {
-          console.error("Error fetching alarms:", error);
+          if (error?.response?.data?.msg === "Token has expired") {
+            navigate("/auth/logout");
+          } else {
+            console.error("Error fetching alarms:", error);
+          }
           setLoading(false);
         });
     }, 1500);
@@ -106,7 +119,7 @@ const HomePage = () => {
 
     const formattedDate = date.toLocaleString("en-GB", options);
 
-    return formattedDate.replace(/,/, '');
+    return formattedDate.replace(/,/, "");
   };
 
   const handlePageChange = (page: number) => {
@@ -132,60 +145,71 @@ const HomePage = () => {
             </div>
           </div>
           <div className="flex flex-col ">
-            {alarms.slice((currentPage - 1) * alarmsPerPage, currentPage * alarmsPerPage).map((alarm, index) => (
-              <div
-                key={`${alarm.Timestamp}-${index}`}
-                className="w-full p-3 bg-white rounded-lg shadow-md flex items-center mt-2 justify-center"
-              >
-                <AiFillWarning
-                  className="text-red-500 text-6xl"
-                  style={{
-                    color:
-                      alarm.Temperature >= 45 && alarm.Temperature < 50
-                        ? "#FFA500"
-                        : alarm.V_of_Device >= 11 && alarm.V_of_Device <= 13
-                        ? "#FFA500"
-                        : alarm.CurrentValue1 > 3
-                        ? "#FFA500"
-                        : alarm.CurrentValue2 > 3
-                        ? "#FFA500"
-                        : alarm.CurrentValue3 > 3
-                        ? "#FFA500"
-                        : alarm.CurrentValue4 > 3
-                        ? "#FFA500"
-                        : alarm.CurrentValue5 > 3
-                        ? "#FFA500"
-                        : alarm.CurrentValue6 > 3
-                        ? "#FFA500"
-                        : alarm.CurrentValue7 > 3
-                        ? "#FFA500"
-                        : alarm.CurrentValue8 > 3
-                        ? "#FFA500"
-                        : alarm.CurrentValue9 > 3
-                        ? "#FFA500"
-                        : alarm.CurrentValue10 > 3
-                        ? "#FFA500"
-                        : alarm.SOBS_Lost_Of_Control > 0
-                        ? "#FFA500"
-                        : alarm.NumOfControl > 0
-                        ? "#FFA500"
-                        : alarm.Conversion_Period_Difference > 1
-                        ? "#FFA500"
-                        : alarm.PackageNum > 0 && alarm.PackageNum <=0
-                        ? "#FFA500"
-                        : "#FF0000"
-                  }}
-                />
+            {alarms
+              .slice(
+                (currentPage - 1) * alarmsPerPage,
+                currentPage * alarmsPerPage
+              )
+              .map((alarm, index) => (
+                <div
+                  key={`${alarm.Timestamp}-${index}`}
+                  className="w-full p-3 bg-white rounded-lg shadow-md flex items-center mt-2 justify-center"
+                >
+                  <AiFillWarning
+                    className="text-red-500 text-6xl"
+                    style={{
+                      color:
+                        alarm.Temperature >= 45 && alarm.Temperature < 50
+                          ? "#FFA500"
+                          : alarm.V_of_Device >= 11 && alarm.V_of_Device <= 13
+                          ? "#FFA500"
+                          : alarm.CurrentValue1 > 3
+                          ? "#FFA500"
+                          : alarm.CurrentValue2 > 3
+                          ? "#FFA500"
+                          : alarm.CurrentValue3 > 3
+                          ? "#FFA500"
+                          : alarm.CurrentValue4 > 3
+                          ? "#FFA500"
+                          : alarm.CurrentValue5 > 3
+                          ? "#FFA500"
+                          : alarm.CurrentValue6 > 3
+                          ? "#FFA500"
+                          : alarm.CurrentValue7 > 3
+                          ? "#FFA500"
+                          : alarm.CurrentValue8 > 3
+                          ? "#FFA500"
+                          : alarm.CurrentValue9 > 3
+                          ? "#FFA500"
+                          : alarm.CurrentValue10 > 3
+                          ? "#FFA500"
+                          : alarm.SOBS_Lost_Of_Control > 0
+                          ? "#FFA500"
+                          : alarm.NumOfControl > 0
+                          ? "#FFA500"
+                          : alarm.Conversion_Period_Difference > 1
+                          ? "#FFA500"
+                          : alarm.PackageNum > 0 && alarm.PackageNum <= 0
+                          ? "#FFA500"
+                          : "#FF0000",
+                    }}
+                  />
 
-                <div className="ml-12">
-                  <div className="flex font-bold mx-auto max-w-screen-xl w-screen ">
-                    <p className="flex-1 text-m font-bold text-gray-800">{formatDate(alarm.Timestamp)}</p>
-                    <p className="flex-1 ml-24 text-m font-bold text-gray-800">{alarm.TableNumber}</p>
-                    <p className="flex-1 text-l font-bold text-gray-800">{alarm.AlarmDescription}</p>
+                  <div className="ml-12">
+                    <div className="flex font-bold mx-auto max-w-screen-xl w-screen ">
+                      <p className="flex-1 text-m font-bold text-gray-800">
+                        {formatDate(alarm.Timestamp)}
+                      </p>
+                      <p className="flex-1 ml-24 text-m font-bold text-gray-800">
+                        {alarm.TableNumber}
+                      </p>
+                      <p className="flex-1 text-l font-bold text-gray-800">
+                        {alarm.AlarmDescription}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
           <div className="fixed bottom-8 left-44 right-0 flex justify-center">
             <button
@@ -200,11 +224,13 @@ const HomePage = () => {
               onChange={(e) => handlePageChange(Number(e.target.value))}
               className="bg-main-blue text-white font-bold py-2 px-2 mr-2 rounded cursor-pointer"
             >
-              {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
-                <option key={page} value={page}>
-                  {page}
-                </option>
-              ))}
+              {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+                (page) => (
+                  <option key={page} value={page}>
+                    {page}
+                  </option>
+                )
+              )}
             </select>
             <button
               onClick={() => handlePageChange(currentPage + 1)}

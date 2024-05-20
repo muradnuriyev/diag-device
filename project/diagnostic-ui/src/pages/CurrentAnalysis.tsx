@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import TesdiqButton from "../layouts/AuthLayout/components/TesdiqButton";
+import { useNavigate } from "react-router-dom";
 
 interface TableData {
   [key: string]: React.ReactNode;
@@ -26,21 +27,29 @@ const CurrentAnalysis = () => {
     "Blok-Kontakt",
     "YD-nın çevrilmə cərəyanı",
     "Blok-Kontakt sayı",
-    "Vaxt"
+    "Vaxt",
   ];
 
+  const navigate = useNavigate();
   const [tableNumbers, setTableNumbers] = useState<string[]>([]);
   const [selectedTableNumber, setSelectedTableNumber] = useState<string>("");
   const [tableData, setTableData] = useState<TableData>({});
+  const access_token = localStorage.getItem("access_token");
 
   useEffect(() => {
-    fetch("http://localhost:5000/table_numbers")
+    fetch("http://localhost:5000/table_numbers", {
+      headers: { Authorization: `Bearer ${access_token}` },
+    })
       .then((response) => response.json())
       .then((data) => {
         setTableNumbers(data.table_numbers);
       })
       .catch((error) => {
-        console.error("Error fetching table numbers:", error);
+        if (error?.response?.data?.msg === "Token has expired") {
+          navigate("/auth/logout");
+        } else {
+          console.error("Error fetching table numbers:", error);
+        }
       });
   }, []);
 
@@ -59,9 +68,9 @@ const CurrentAnalysis = () => {
 
     const formattedDate = date.toLocaleString("en-GB", options);
 
-    return formattedDate.replace(/,/, '');
+    return formattedDate.replace(/,/, "");
   };
-  
+
   const handleButtonClick = () => {
     if (selectedTableNumber) {
       const selectedTableName = `yd_${selectedTableNumber}`;
@@ -69,6 +78,7 @@ const CurrentAnalysis = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${access_token}`,
         },
         body: JSON.stringify({ table: selectedTableName }),
       })
@@ -80,14 +90,24 @@ const CurrentAnalysis = () => {
         })
         .then((data) => {
           setTableData(data);
-          fetch("http://localhost:5000/alarms")
+          fetch("http://localhost:5000/alarms", {
+            headers: { Authorization: `Bearer ${access_token}` },
+          })
             .then((response) => response.json())
             .catch((error) => {
-              console.error("Error fetching alarms:", error);
+              if (error?.response?.data?.msg === "Token has expired") {
+                navigate("/auth/logout");
+              } else {
+                console.error("Error fetching alarms:", error);
+              }
             });
         })
         .catch((error) => {
-          console.error("Error fetching table data:", error);
+          if (error?.response?.data?.msg === "Token has expired") {
+            navigate("/auth/logout");
+          } else {
+            console.error("Error fetching table data:", error);
+          }
         });
     }
   };
@@ -111,7 +131,10 @@ const CurrentAnalysis = () => {
           </select>
         </div>
         <div className="mr-4">
-          <TesdiqButton onClick={handleButtonClick} disabled={!selectedTableNumber}>
+          <TesdiqButton
+            onClick={handleButtonClick}
+            disabled={!selectedTableNumber}
+          >
             Təsdiqlə
           </TesdiqButton>
         </div>
@@ -123,14 +146,16 @@ const CurrentAnalysis = () => {
             <div className="w-1/2 pr-2">
               <p className="font-semibold text-xl text-gray-800">{name}</p>
             </div>
-            <div className='w-1/2 pl-2bg-red-300'>
+            <div className="w-1/2 pl-2bg-red-300">
               <div className="bg-main rounded p-2">
                 <table className="w-full">
                   <tbody>
                     <tr className="flex justify-between">
                       <td className="font-semibold pl-2 pr-2">Qiymət: </td>
                       <td className="pr-2">
-                        {name === 'Vaxt' ? formatDate(tableData[name] as string) : tableData[name]}
+                        {name === "Vaxt"
+                          ? formatDate(tableData[name] as string)
+                          : tableData[name]}
                       </td>
                     </tr>
                   </tbody>
@@ -139,7 +164,6 @@ const CurrentAnalysis = () => {
             </div>
           </div>
         ))}
-
       </div>
     </div>
   );

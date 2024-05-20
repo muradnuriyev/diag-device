@@ -3,7 +3,7 @@ import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from datetime import datetime, timezone, timedelta
-from flask_jwt_extended import JWTManager, create_access_token
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required
 import mysql.connector.pooling
 import types
 
@@ -14,6 +14,7 @@ load_dotenv()
 CORS(app, origins=os.getenv("FRONTEND_URL"))
 
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=30)
 jwt=JWTManager()
 jwt.init_app(app)
 
@@ -403,6 +404,7 @@ def check_alarms():
         db_info_package.close()
 
 @app.route('/alarms', methods=['GET'])
+@jwt_required()
 def get_alarms():
     db_info_package = info_package_db_pool.get_connection()
     try:
@@ -418,6 +420,7 @@ def get_alarms():
 
 #===================================================================== Cari Analiz (CurrentAnalysis.tsx page) =======================================================================
 @app.route('/table_names', methods=['GET'])
+@jwt_required()
 def get_table_names():
     db_info_package = info_package_db_pool.get_connection()
     
@@ -433,6 +436,7 @@ def get_table_names():
         db_info_package.close()
 
 @app.route('/table_data', methods=['POST'])
+@jwt_required()
 def get_table_data():
     db_info_package = info_package_db_pool.get_connection()
 
@@ -509,6 +513,7 @@ def get_table_data():
 
 #================================================================== Interval Analiz (IntervalAnalysis.tsx page) =====================================================================
 @app.route('/table_numbers', methods=['GET'])
+@jwt_required()
 def get_table_numbers():
     db_info_package = info_package_db_pool.get_connection()
 
@@ -520,6 +525,7 @@ def get_table_numbers():
         db_info_package.close()
 
 @app.route('/timestamps/<int:table_number>', methods=['GET'])
+@jwt_required()
 def get_timestamps(table_number):
     db_info_package = info_package_db_pool.get_connection()
     try:
@@ -544,6 +550,7 @@ def get_timestamps(table_number):
 
 
 @app.route('/v_of_device_data/<table>/<from_timestamp>/<to_timestamp>', methods=['GET'])
+@jwt_required()
 def get_v_of_device_data(table, from_timestamp, to_timestamp):
     db_info_package = info_package_db_pool.get_connection()
     try:
@@ -567,6 +574,7 @@ def get_v_of_device_data(table, from_timestamp, to_timestamp):
         db_info_package.close()
 
 @app.route('/temperature_data/<table>/<from_timestamp>/<to_timestamp>', methods=['GET'])
+@jwt_required()
 def get_temperature_data(table, from_timestamp, to_timestamp):
     db_info_package = info_package_db_pool.get_connection()
     try:
@@ -590,6 +598,7 @@ def get_temperature_data(table, from_timestamp, to_timestamp):
         db_info_package.close()
 
 @app.route('/current_values_data/<table>/<from_timestamp>/<to_timestamp>', methods=['GET'])
+@jwt_required()
 def get_current_values_data(table, from_timestamp, to_timestamp):
     db_info_package = info_package_db_pool.get_connection()
     try:
@@ -613,6 +622,7 @@ def get_current_values_data(table, from_timestamp, to_timestamp):
         db_info_package.close()
 
 @app.route('/current_accident_values_data/<table>/<from_timestamp>/<to_timestamp>', methods=['GET'])
+@jwt_required()
 def get_current_accident_values_data(table, from_timestamp, to_timestamp):
     db_info_package = info_package_db_pool.get_connection()
     try:
@@ -636,6 +646,7 @@ def get_current_accident_values_data(table, from_timestamp, to_timestamp):
         db_info_package.close()
 
 @app.route('/u_all_data/<table>/<from_timestamp>/<to_timestamp>', methods=['GET'])
+@jwt_required()
 def get_u_all_data(table, from_timestamp, to_timestamp):
     db_info_package = info_package_db_pool.get_connection()
     try:
@@ -660,6 +671,7 @@ def get_u_all_data(table, from_timestamp, to_timestamp):
 
 
 @app.route('/block_contact_n_data/<table>/<from_timestamp>/<to_timestamp>', methods=['GET'])
+@jwt_required()
 def get_block_contact_n_data(table, from_timestamp, to_timestamp):
     db_info_package = info_package_db_pool.get_connection()
     try:
@@ -683,6 +695,7 @@ def get_block_contact_n_data(table, from_timestamp, to_timestamp):
         db_info_package.close()
 
 @app.route('/block_contact_data/<table>/<from_timestamp>/<to_timestamp>', methods=['GET'])
+@jwt_required()
 def get_block_contact_data(table, from_timestamp, to_timestamp):
     db_info_package = info_package_db_pool.get_connection()
     try:
@@ -706,6 +719,7 @@ def get_block_contact_data(table, from_timestamp, to_timestamp):
         db_info_package.close()
 
 @app.route('/conversion_period_data/<table>/<from_timestamp>/<to_timestamp>', methods=['GET'])
+@jwt_required()
 def get_conversion_period_data(table, from_timestamp, to_timestamp):
     db_info_package = info_package_db_pool.get_connection()
     try:
@@ -729,6 +743,7 @@ def get_conversion_period_data(table, from_timestamp, to_timestamp):
         db_info_package.close()
 
 @app.route('/num_of_control_data/<table>/<from_timestamp>/<to_timestamp>', methods=['GET'])
+@jwt_required()
 def get_num_of_control_data(table, from_timestamp, to_timestamp):
     db_info_package = info_package_db_pool.get_connection()
     try:
@@ -752,6 +767,7 @@ def get_num_of_control_data(table, from_timestamp, to_timestamp):
         db_info_package.close()
 
 @app.route('/kurbel_data/<table>/<from_timestamp>/<to_timestamp>', methods=['GET'])
+@jwt_required()
 def get_kurbel_data(table, from_timestamp, to_timestamp):
     db_info_package = info_package_db_pool.get_connection()
     try:
@@ -775,6 +791,7 @@ def get_kurbel_data(table, from_timestamp, to_timestamp):
         db_info_package.close()
 
 @app.route('/sobs_lost_of_control_data/<table>/<from_timestamp>/<to_timestamp>', methods=['GET'])
+@jwt_required()
 def get_sobs_lost_of_control_data(table, from_timestamp, to_timestamp):
     db_info_package = info_package_db_pool.get_connection()
     try:
@@ -802,6 +819,7 @@ def get_sobs_lost_of_control_data(table, from_timestamp, to_timestamp):
 
 #============================================================================= Qeyd (Note.tsx page) =================================================================================
 @app.route('/store_note', methods=['POST'])
+@jwt_required()
 def store_note():
     db_note = user_note_db_pool.get_connection()
 
@@ -822,6 +840,7 @@ def store_note():
         db_note.close()
 
 @app.route('/get_notes', methods=['GET'])
+@jwt_required()
 def get_notes():
     db_note = user_note_db_pool.get_connection()
     db_user = user_db_pool.get_connection()

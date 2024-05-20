@@ -15,25 +15,32 @@ interface Note {
 const NoteComponent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [sahe, setSahe] = useState(localStorage.getItem("sahe") || "");
-  const [userFullName, setUserFullName] = useState(localStorage.getItem("userFullName") || "");
+  const [userFullName, setUserFullName] = useState(
+    localStorage.getItem("userFullName") || ""
+  );
   const [note, setNote] = useState("");
   const [notes, setNotes] = useState<Note[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const notesPerPage = 7;
   const totalPages = Math.ceil(notes.length / notesPerPage);
+  const access_token = localStorage.getItem("access_token");
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
   const handleModalClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if ((e.target as HTMLElement).classList.contains("modal-container")) closeModal();
+    if ((e.target as HTMLElement).classList.contains("modal-container"))
+      closeModal();
   };
 
   const sendDataToServer = async () => {
     try {
       const response = await fetch("http://localhost:5000/store_note", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${access_token}`,
+        },
         body: JSON.stringify({ sahe, userFullName, note }),
       });
 
@@ -55,7 +62,9 @@ const NoteComponent = () => {
 
   const fetchNotes = async () => {
     try {
-      const response = await fetch("http://localhost:5000/get_notes");
+      const response = await fetch("http://localhost:5000/get_notes", {
+        headers: { Authorization: `Bearer ${access_token}` },
+      });
       if (response.ok) {
         const data = await response.json();
         setNotes(data.notes);
@@ -101,22 +110,29 @@ const NoteComponent = () => {
             <h3 className="text-2xl font-semibold mb-2">Problemin təsviri</h3>
           </div>
         </div>
-        {notes.slice((currentPage - 1) * notesPerPage, currentPage * notesPerPage).map((note, index) => (
-          <div key={index} className="flex p-6 bg-white rounded-lg shadow-md space-x-8 mb-1">
-            <div className="w-1/4 border-r pr-4">
-              <p className="text-lg">{note.FullName}</p>
+        {notes
+          .slice((currentPage - 1) * notesPerPage, currentPage * notesPerPage)
+          .map((note, index) => (
+            <div
+              key={index}
+              className="flex p-6 bg-white rounded-lg shadow-md space-x-8 mb-1"
+            >
+              <div className="w-1/4 border-r pr-4">
+                <p className="text-lg">{note.FullName}</p>
+              </div>
+              <div className="w-1/4 border-r pr-4">
+                <p className="text-lg">{note.Vezife}</p>
+              </div>
+              <div className="w-1/4 border-r pr-4">
+                <p className="text-lg">
+                  {new Date(note.timestamp).toLocaleDateString()}
+                </p>
+              </div>
+              <div className="w-1/4">
+                <p className="text-lg">{note.Note}</p>
+              </div>
             </div>
-            <div className="w-1/4 border-r pr-4">
-              <p className="text-lg">{note.Vezife}</p>
-            </div>
-            <div className="w-1/4 border-r pr-4">
-              <p className="text-lg">{new Date(note.timestamp).toLocaleDateString()}</p>
-            </div>
-            <div className="w-1/4">
-              <p className="text-lg">{note.Note}</p>
-            </div>
-          </div>
-        ))}
+          ))}
         <div className="flex justify-center mt-4">
           <button
             onClick={() => handlePageChange(currentPage - 1)}
@@ -130,11 +146,13 @@ const NoteComponent = () => {
             onChange={(e) => handlePageChange(Number(e.target.value))}
             className="bg-main-blue text-white font-bold py-2 px-2 mr-2 rounded cursor-pointer"
           >
-            {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
-              <option key={page} value={page}>
-                {page}
-              </option>
-            ))}
+            {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+              (page) => (
+                <option key={page} value={page}>
+                  {page}
+                </option>
+              )
+            )}
           </select>
           <button
             onClick={() => handlePageChange(currentPage + 1)}
