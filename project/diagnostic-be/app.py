@@ -103,34 +103,34 @@ def check_alarms():
             records = cursor.fetchall()
 
             for record in records:
-                timestamp = record['Timestamp']
+                timestamp = record['Timestamp']                                     # Vaxt
 
                 v_of_device = record.get('V_of_Device', None)
-                right_turn = record.get('RightTurn', None)
-                left_turn = record.get('LeftTurn', None)
-                temperature = record.get('Temperature', None)
-                sobs3ap = record.get('SOBS3AP', None)
-                uAB = record.get('U_AB', None)   # AB faza gərginlik həddi 
-                uBC = record.get('U_BC', None)   # BC faza gərginlik həddi 
-                uAC = record.get('U_AC', None)   # AC faza gərginlik həddi 
-                phaseA = record.get('Current_Accident_A', None)
-                phaseB = record.get('Current_Accident_B', None)
-                phaseC = record.get('Current_Accident_C', None)
-                ydInfo = record.get("YD_Info", None)
-                currentValue1 = record.get("CurrentValue1", None)
-                currentValue2 = record.get("CurrentValue2", None)
-                currentValue3 = record.get("CurrentValue3", None)
-                currentValue4 = record.get("CurrentValue4", None)
-                currentValue5 = record.get("CurrentValue5", None)
-                currentValue6 = record.get("CurrentValue6", None)
-                currentValue7 = record.get("CurrentValue7", None)
-                currentValue8 = record.get("CurrentValue8", None)
-                currentValue9 = record.get("CurrentValue9", None)
-                currentValue10 = record.get("CurrentValue10", None)
-                sobsLostOfcontrol = record.get("SOBS_Lost_Of_Control", None)
-                numOfControl = record.get("NumOfControl", None)
-                packageNum = record.get("Package_Num", None)
-                conversion_period = record.get('Conversion_Period', None)
+                right_turn = record.get('RightTurn', None)                          # Nəzarət sa]dadır
+                left_turn = record.get('LeftTurn', None)                            # Nəzarət sa]dadır
+                temperature = record.get('Temperature', None)                       # Temperatur
+                sobs3ap = record.get('SOBS3AP', None)                               # SOBS gərginlik
+                uAB = record.get('U_AB', None)                                      # AB faza gərginlik həddi 
+                uBC = record.get('U_BC', None)                                      # BC faza gərginlik həddi 
+                uAC = record.get('U_AC', None)                                      # AC faza gərginlik həddi 
+                phaseA = record.get('Current_Accident_A', None)                     # Qəza faza cərəyanı A 
+                phaseB = record.get('Current_Accident_B', None)                     # Qəza faza cərəyanı B
+                phaseC = record.get('Current_Accident_C', None)                     # Qəza faza cərəyanı C
+                ydInfo = record.get("YD_Info", None)                                # İtki var yoxsa yox
+                currentValue1 = record.get("CurrentValue1", None)                   # Cərəyan 1
+                currentValue2 = record.get("CurrentValue2", None)                   # Cərəyan 2
+                currentValue3 = record.get("CurrentValue3", None)                   # Cərəyan 3
+                currentValue4 = record.get("CurrentValue4", None)                   # Cərəyan 4
+                currentValue5 = record.get("CurrentValue5", None)                   # Cərəyan 5
+                currentValue6 = record.get("CurrentValue6", None)                   # Cərəyan 6
+                currentValue7 = record.get("CurrentValue7", None)                   # Cərəyan 7
+                currentValue8 = record.get("CurrentValue8", None)                   # Cərəyan 8
+                currentValue9 = record.get("CurrentValue9", None)                   # Cərəyan 9
+                currentValue10 = record.get("CurrentValue10", None)                 # Cərəyan 10
+                sobsLostOfcontrol = record.get("SOBS_Lost_Of_Control", None)        # SOBS gərginliyin itmə sayı
+                numOfControl = record.get("NumOfControl", None)                     # Nəzarətin itmə sayı
+                packageNum = record.get("Package_Num", None)                        # Paket sayı
+                conversion_period = record.get('Conversion_Period', None)           # Çevrilmə müddəti
 
 
                 if prev_conversion_period is not None and conversion_period is not None:
@@ -166,14 +166,14 @@ def check_alarms():
                             'TableNumber': f"YD-{str(table_num).zfill(2)}",
                             'Temperature': temperature,
                             'Timestamp': timestamp,
-                            'AlarmDescription': "Temperatur 50°C  artıqdır!",
+                            'AlarmDescription': "Temperatur 50°C  artıqdır!",                   # Qəza vəziyyəti
                         })
                     if temperature >= 45 and temperature < 50:
                         alarms.append({
                             'TableNumber': f"YD-{str(table_num).zfill(2)}",
                             'Temperature': temperature,
                             'Timestamp': timestamp,
-                            'AlarmDescription': "Temperatur 45°C artıqdır!",
+                            'AlarmDescription': "Temperatur 45°C artıqdır!",                    # Təhlükəli vəziyyət
                         })
 
                 if right_turn is not None and left_turn is not None:
@@ -277,7 +277,7 @@ def check_alarms():
                             'TableNumber': f"YD-{str(table_num).zfill(2)}",
                             'CurrentValue1' : currentValue1,
                             'Timestamp': timestamp,
-                            'AlarmDescription': "Cərəyanın (1) birinci qiymətinin həddi 3 A-dən (Amper) böyükdür!",
+                            'AlarmDescription': "Cərəyanın (1) birinci qiymətinin həddi 3 A-dən böyükdür!",
                         })
                     if float(currentValue2) > 3.00:
                         alarms.append({
