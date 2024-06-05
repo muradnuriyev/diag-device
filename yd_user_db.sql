@@ -32,6 +32,7 @@ CREATE TABLE `users` (
   `username` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `fullName` varchar(255) NOT NULL,
+  `Vezife` varchar(255) NOT NULL,
   `Sahe` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -39,8 +40,8 @@ CREATE TABLE `users` (
 -- Дамп данных таблицы `users`
 --
 
-INSERT INTO `users` (`ID`, `username`, `password`, `fullName`, `Sahe`) VALUES
-(1, '9594', '27-08-2001', 'Murad Nuriyev', 'IMB-4(Qx)');
+INSERT INTO `users` (`ID`, `username`, `password`, `fullName`,`Vezife`, `Sahe`) VALUES
+(1, '9594', '27-08-2001', 'Murad Nuriyev','Mühəndis', 'IMB-4(Qx)');
 
 --
 -- Индексы сохранённых таблиц
