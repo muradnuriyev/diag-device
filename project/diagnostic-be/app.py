@@ -214,7 +214,7 @@ def check_alarms():
                         })
 
                 if sobs3ap is not None:
-                    if sobs3ap == 0:
+                    if sobs3ap == 1:
                         alarms.append({
                             'TableNumber': f"YD-{str(table_num).zfill(2)}",
                             'SOBS3AP' : sobs3ap,
@@ -381,7 +381,7 @@ def check_alarms():
                         })
                             
                     if ydInfo is not None:
-                        if int(ydInfo) == 0:
+                        if int(ydInfo) == 1:
                             alarms.append({
                                 'TableNumber': f"YD-{str(table_num).zfill(2)}",
                                 'YD_Info' : ydInfo,

@@ -8,7 +8,6 @@ from tkinter import messagebox
 import threading
 import atexit
 
-
 class DataCollector:
     def __init__(self):
         self.serial_port = None
@@ -17,14 +16,16 @@ class DataCollector:
         self.is_storing = False
         self.stop_event = threading.Event()
 
+        self.partial_package = ""  # To store incomplete package parts
+
         self.initialize_db_connection()
 
     def initialize_db_connection(self):
         try:
             self.db_connection = mysql.connector.connect(
-                host='localhost',
+                host='10.0.10.100',
                 user='root',
-                password='',
+                password='metrosite',
                 database='yd_information_package'
             )
             self.cursor = self.db_connection.cursor()
@@ -71,15 +72,20 @@ class DataCollector:
     def read_packages(self):
         while self.is_storing:
             try:
-                package = self.serial_port.readline().decode('latin-1').strip()
+                line = self.serial_port.readline().decode('latin-1').strip()
 
-                if not package:
+                if not line:
                     continue
 
-                package_values = package.split('/')
+                self.partial_package += line
 
-                if len(package_values) != 31:
-                    messagebox.showwarning("Xəbərdarlıq", f"Yanlış paket formatı: {package}")
+                package_values = self.partial_package.split('/')
+
+                if len(package_values) < 31:
+                    continue
+                elif len(package_values) > 31:
+                    messagebox.showwarning("Xəbərdarlıq", f"Yanlış paket formatı: {self.partial_package}")
+                    self.partial_package = ""
                     continue
 
                 try:
@@ -99,11 +105,22 @@ class DataCollector:
                     self.db_connection.commit()
 
                     print(f"Package stored successfully in {table_number}.")
+
+                    self.partial_package = ""
                 except ValueError as e:
                     messagebox.showwarning("Xəbərdarlıq", f"Paketin işlənməsi xətası: {e}")
             except serial.SerialException as e:
                 messagebox.showerror("Xəta", f"Serial portundan oxunma xətası: {e}")
                 break
+
+    def close(self):
+        self.stop_storing()
+        if self.cursor:
+            self.cursor.close()
+        if self.db_connection:
+            self.db_connection.close()
+
+
 
 def start_collecting():
     start_button.config(state=tk.DISABLED)
@@ -190,7 +207,8 @@ def on_leave(e):
 
 
 def on_close():
-    root.withdraw()
+    data_collector.close()
+    root.destroy()
 
 
 data_collector = DataCollector()
@@ -217,13 +235,18 @@ stop_button.pack(pady=10)
 show_tables_button = ttk.Button(root, text="Cədvəlləri Göstər", command=show_tables, style="TButton")
 show_tables_button.pack(pady=10)
 
+close_button = ttk.Button(root, text="Bağla", command=on_close, style="TButton")
+close_button.pack(pady=10)
+
 start_button.bind("<Enter>", on_enter)
 start_button.bind("<Leave>", on_leave)
 stop_button.bind("<Enter>", on_enter)
 stop_button.bind("<Leave>", on_leave)
 show_tables_button.bind("<Enter>", on_enter)
 show_tables_button.bind("<Leave>", on_leave)
+close_button.bind("<Enter>", on_enter)
+close_button.bind("<Leave>", on_leave)
 
-atexit.register(stop_collecting)
+atexit.register(on_close)
 
 root.mainloop()
