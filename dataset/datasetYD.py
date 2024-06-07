@@ -16,7 +16,7 @@ class DataCollector:
         self.is_storing = False
         self.stop_event = threading.Event()
 
-        self.partial_package = ""  # To store incomplete package parts
+        self.partial_package = ""
 
         self.initialize_db_connection()
 
