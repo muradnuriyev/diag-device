@@ -365,11 +365,12 @@ def check_alarms():
                     if sobsLostOfcontrol is not None:
                         if sobsLostOfcontrol > 0:
                             alarms.append({
-                            'TableNumber': f"YD-{str(table_num).zfill(2)}",
-                            'SOBS_Lost_Of_Control' : sobsLostOfcontrol,
-                            'Timestamp': timestamp,
-                            'AlarmDescription': "Nəzarətə gələn gərginliyin(SOBS3AP) itmə sayı (0) sıfırdan böyükdür",
-                        })
+                                'TableNumber': f"YD-{str(table_num).zfill(2)}",
+                                'SOBS_Lost_Of_Control': sobsLostOfcontrol,
+                                'Timestamp': timestamp,
+                                'AlarmDescription': f"Nəzarətə gələn gərginliyin(SOBS3AP) itmə sayı: "+ str(sobsLostOfcontrol),
+                            })
+
                             
                     if numOfControl is not None:
                         if numOfControl > 0:
@@ -377,11 +378,17 @@ def check_alarms():
                             'TableNumber': f"YD-{str(table_num).zfill(2)}",
                             'NumOfControl' : numOfControl,
                             'Timestamp': timestamp,
-                            'AlarmDescription': "Nəzarət itmə sayı (0) sıfırdan böyükdür",
+                            'AlarmDescription': "Nəzarət itmə sayı (0) sıfırdan böyükdür və bərabərdir " +str(numOfControl),
                         })
                             
                     if ydInfo is not None:
-                        if int(ydInfo) == 1:
+                        ydInfo_list = [int(num) for num in str(ydInfo)]
+                        continuous = True
+                        for i in range(len(ydInfo_list) - 1):
+                            if ydInfo_list[i + 1] - ydInfo_list[i] != 1:
+                                continuous = False
+                                break
+                        if not continuous:
                             alarms.append({
                                 'TableNumber': f"YD-{str(table_num).zfill(2)}",
                                 'YD_Info' : ydInfo,
