@@ -35,7 +35,7 @@ const AuthLayout: FC = () => {
     },
     {
       icon: <IoAnalyticsSharp />,
-      label: "Interval Analiz",
+      label: "Interval analiz",
       path: "/auth/interval-analysis",
     },
     {

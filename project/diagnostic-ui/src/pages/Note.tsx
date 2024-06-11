@@ -14,6 +14,7 @@ interface Note {
 
 const NoteComponent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [sahe, setSahe] = useState(localStorage.getItem("sahe") || "");
   const [userFullName, setUserFullName] = useState(
     localStorage.getItem("userFullName") || ""
@@ -27,6 +28,7 @@ const NoteComponent = () => {
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
+  const closeFullNoteModal = () => setSelectedNote(null);
 
   const handleModalClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if ((e.target as HTMLElement).classList.contains("modal-container"))
@@ -116,6 +118,7 @@ const NoteComponent = () => {
             <div
               key={index}
               className="flex p-6 bg-white rounded-lg shadow-md space-x-8 mb-1"
+              onClick={() => setSelectedNote(note)}
             >
               <div className="w-1/4 border-r pr-4">
                 <p className="text-lg">{note.FullName}</p>
@@ -128,8 +131,12 @@ const NoteComponent = () => {
                   {new Date(note.timestamp).toLocaleDateString()}
                 </p>
               </div>
-              <div className="w-1/4">
-                <p className="text-lg">{note.Note}</p>
+              <div className="w-1/4 truncate">
+                <p className="text-lg">
+                  {note.Note.length > 30
+                    ? `${note.Note.substring(0, 30)}...`
+                    : note.Note}
+                </p>
               </div>
             </div>
           ))}
@@ -230,6 +237,41 @@ const NoteComponent = () => {
             <div className="flex justify-center mt-auto">
               <TesdiqButton onClick={handleConfirmClick}>Təsdiqlə</TesdiqButton>
             </div>
+          </div>
+        </div>
+      )}
+      {selectedNote && (
+        <div className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-75 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-lg shadow-md w-[40%] h-[80%] flex flex-col justify-between">
+            <h2 className="text-2xl font-semibold mb-4">Qeydın detalları</h2>
+            <div className="flex mb-4">
+              <div className="w-1/3">
+                <h3 className="text-xl font-semibold">Ad Soyad</h3>
+                <p className="text-lg">{selectedNote.FullName}</p>
+              </div>
+              <div className="w-1/3">
+                <h3 className="text-xl font-semibold">Vəzifəsi</h3>
+                <p className="text-lg">{selectedNote.Vezife}</p>
+              </div>
+              <div className="w-1/3">
+                <h3 className="text-xl font-semibold">Tarix</h3>
+                <p className="text-lg">
+                  {new Date(selectedNote.timestamp).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+            <div className="flex mb-4">
+              <div className="w-full">
+                <h3 className="text-xl font-semibold">Qeyd</h3>
+                <p className="text-lg">{selectedNote.Note}</p>
+              </div>
+            </div>
+            <button
+              onClick={closeFullNoteModal}
+              className="self-center bg-main-blue text-white px-4 py-2 rounded-lg hover:bg-main transition duration-300"
+            >
+              Bağla
+            </button>
           </div>
         </div>
       )}

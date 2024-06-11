@@ -32,8 +32,12 @@ const CurrentAnalysis = () => {
 
   const navigate = useNavigate();
   const [tableNumbers, setTableNumbers] = useState<string[]>([]);
-  const [selectedTableNumber, setSelectedTableNumber] = useState<string>("");
-  const [tableData, setTableData] = useState<TableData>({});
+  const [selectedTableNumber, setSelectedTableNumber] = useState<string>(
+    localStorage.getItem("selectedTableNumber") || ""
+  );
+  const [tableData, setTableData] = useState<TableData>(
+    JSON.parse(localStorage.getItem("tableData") || "{}")
+  );
   const access_token = localStorage.getItem("access_token");
 
   useEffect(() => {
@@ -90,6 +94,8 @@ const CurrentAnalysis = () => {
         })
         .then((data) => {
           setTableData(data);
+          localStorage.setItem("tableData", JSON.stringify(data));
+          localStorage.setItem("selectedTableNumber", selectedTableNumber);
           fetch("http://localhost:5000/alarms", {
             headers: { Authorization: `Bearer ${access_token}` },
           })
@@ -146,7 +152,7 @@ const CurrentAnalysis = () => {
             <div className="w-1/2 pr-2">
               <p className="font-semibold text-xl text-gray-800">{name}</p>
             </div>
-            <div className="w-1/2 pl-2bg-red-300">
+            <div className="w-1/2 pl-">
               <div className="bg-main rounded p-2">
                 <table className="w-full">
                   <tbody>
