@@ -923,6 +923,36 @@ def get_notes():
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+#======================================================================== IQ3Jurnal (IQ3Journal.tsx page) ===========================================================================
+
+@app.route('/store_iq3journal', methods=['POST'])
+@jwt_required()
+def store_iq3journal():
+    db_note = user_note_db_pool.get_connection()
+
+    try:
+        data = request.json
+        sahe = data.get('sahe')
+        user_full_name = data.get('userFullName')
+        tex_pros_qrafik_bend = data.get('texProsQrafikBend')
+        note = data.get('note')
+
+        query = "INSERT INTO yd_iq3journal (Sahe, FullName, TexProsQrafikBend, Note, timestamp) VALUES (%s, %s, %s, %s, NOW())"
+        with db_note.cursor() as cursor:
+            cursor.execute(query, (sahe, user_full_name, tex_pros_qrafik_bend, note))
+        db_note.commit()
+
+        response = jsonify({'message': 'Note stored successfully'})
+        return response
+    finally:
+        db_note.close()
+
+
+
+
+#======================================================================== IQ3Jurnal (IQ3Journal.tsx page) ===========================================================================
+
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
     app.run(debug=True, threaded=True, host='0.0.0.0', port=5000)
