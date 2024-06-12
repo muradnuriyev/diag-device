@@ -118,6 +118,13 @@ const CurrentAnalysis = () => {
     }
   };
 
+  const handleResetClick = () => {
+    setSelectedTableNumber("");
+    setTableData({});
+    localStorage.removeItem("tableData");
+    localStorage.removeItem("selectedTableNumber");
+  };
+
   return (
     <div className="w-full ml-10 mr-10">
       <div className="bg-white rounded-lg shadow-md p-6 flex items-center justify-between mt-4">
@@ -136,13 +143,18 @@ const CurrentAnalysis = () => {
             ))}
           </select>
         </div>
-        <div className="mr-4">
-          <TesdiqButton
-            onClick={handleButtonClick}
-            disabled={!selectedTableNumber}
-          >
-            Təsdiqlə
-          </TesdiqButton>
+        <div className="flex">
+          <div className="mr-4">
+            <TesdiqButton onClick={handleResetClick}>Sıfırla</TesdiqButton>
+          </div>
+          <div className="mr-4">
+            <TesdiqButton
+              onClick={handleButtonClick}
+              disabled={!selectedTableNumber}
+            >
+              Təsdiqlə
+            </TesdiqButton>
+          </div>
         </div>
       </div>
 
@@ -152,7 +164,7 @@ const CurrentAnalysis = () => {
             <div className="w-1/2 pr-2">
               <p className="font-semibold text-xl text-gray-800">{name}</p>
             </div>
-            <div className="w-1/2 pl-">
+            <div className="w-1/2 pl-2">
               <div className="bg-main rounded p-2">
                 <table className="w-full">
                   <tbody>
