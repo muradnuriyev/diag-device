@@ -16,7 +16,7 @@ const CurrentDate = () => {
   }, []);
 
   return (
-    <div className="flex items-center">
+    <div className="flex items-center justify-center">
       <p className="text-4xl">
         <LuCalendarDays />
       </p>
