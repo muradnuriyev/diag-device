@@ -4,7 +4,7 @@ const IQ64Journal = () => {
     <div className="w-full m-7 flex ">
       <div className="flex flex-col w-full">
         <div className="h-screen p-6 bg-white rounded-lg shadow-md flex flex-col">
-          SU64Journal
+          IQ64Journal
         </div>
       </div>
     </div>

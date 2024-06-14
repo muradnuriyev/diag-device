@@ -14,8 +14,7 @@ import IQ3JournalPage from "@pages/IQ3Journal";
 import CurrentAnalysisPage from "@pages/CurrentAnalysis";
 import IntervalAnalysisPage from "@pages/IntervalAnalysis";
 import Logout from "@pages/Logout.tsx";
-import SU64Journal from "@pages/SU64Journal";
-import IQ64Journal from "@pages/SU64Journal";
+import IQ64Journal from "@pages/IQ64Journal";
 
 const access_token = localStorage.getItem("access_token");
 
