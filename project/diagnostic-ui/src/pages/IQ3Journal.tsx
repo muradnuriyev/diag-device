@@ -1,9 +1,10 @@
-import { useState, } from "react";
+import { useState } from "react";
 import TesdiqButton from "../layouts/AuthLayout/components/TesdiqButton";
 import CurrentDate from "../layouts/AuthLayout/components/CurrentDate";
 import CurrentTime from "../layouts/AuthLayout/components/CurrentTime";
 
 const IQ3Journal = () => {
+  const [section, setSection] = useState("plan");
   const [sahe, setSahe] = useState(localStorage.getItem("sahe") || "");
   const [userFullName, setUserFullName] = useState(
     localStorage.getItem("userFullName") || ""
@@ -14,7 +15,8 @@ const IQ3Journal = () => {
 
   const sendDataToServer = async () => {
     try {
-      const response = await fetch("http://localhost:5000/store_iq3journal", {
+      const endpoint = section === "plan" ? "/store_iq3journalPlan" : "/store_iq3journalHesabat";
+      const response = await fetch(`http://localhost:5000${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,9 +41,24 @@ const IQ3Journal = () => {
   };
 
   return (
-    <div className="w-full m-7 flex ">
+    <div className="w-full m-7 flex">
       <div className="flex flex-col w-full">
         <div className="h-screen p-6 bg-white rounded-lg shadow-md flex flex-col">
+          <div className="flex items-center mb-4 text-lg">
+            <button
+              className={`mr-4 ${section === "plan" ? "font-bold" : ""}`}
+              onClick={() => setSection("plan")}
+            >
+              Plan
+            </button>
+            <button
+              className={`${section === "hesabat" ? "font-bold" : ""}`}
+              onClick={() => setSection("hesabat")}
+            >
+              Hesabat
+            </button>
+          </div>
+          
           <div className="flex items-center mb-4">
             <div className="w-3/4">
               <h3 className="text-xl font-semibold">Sahə</h3>
@@ -88,29 +105,39 @@ const IQ3Journal = () => {
           </div>
           <div className="flex items-center mb-4">
             <div className="w-3/4">
-              <h3 className="text-xl font-semibold">Tarix</h3>
+              <h3 className="text-xl font-semibold">Cari Vaxt</h3>
             </div>
-            <div className="w-1/4 border rounded-lg border-main-blue p-2">
+            <div className="w-1/8 border rounded-lg border-main-blue p-2 mr-14">
               <CurrentDate />
             </div>
-          </div>
-          <div className="flex items-center mb-4">
-            <div className="w-3/4">
-              <h3 className="text-xl font-semibold">Saat</h3>
-            </div>
-            <div className="w-1/4 border rounded-lg border-main-blue p-2">
+            <div className="w-1/8 border rounded-lg border-main-blue p-2">
               <CurrentTime />
             </div>
           </div>
           <div className="flex items-center mb-4">
+            <div className="w-3/4">
+            <h3 className="text-xl font-semibold">
+                {section === "plan" ? "Son vaxt" : "Görülən işlərin son vaxtı"}
+              </h3>
+            </div>
+            <div className="w-1/4 border rounded-lg border-main-blue p-2">
+              {/* Placeholder for future implementation */}
+            </div>
+          </div>
+
+          <div className="flex items-center mb-4">
             <div className="w-1/2">
-              <h3 className="text-xl font-semibold">Qeyd</h3>
+              <h3 className="text-xl font-semibold">
+                {section === "plan" ? "Qeyd" : "Görülən İşlər"}
+              </h3>
             </div>
             <div className="w-1/2">
               <textarea
-                rows={12}
+                rows={8}
                 className="w-full border rounded-lg border-main-blue p-2"
-                placeholder="Burada problemin təsvirini yazın"
+                placeholder={
+                  section === "plan" ? "Burada görüləcək işləri yazın" : "Burada görülən işləri yazın"
+                }
                 onChange={(e) => setNote(e.target.value)}
                 value={note}
               />

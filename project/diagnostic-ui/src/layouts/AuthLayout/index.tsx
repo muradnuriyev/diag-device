@@ -3,15 +3,15 @@ import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import logo from "@assets/logo.png";
 import { AiFillHome } from "react-icons/ai";
 import { FaSearchengin } from "react-icons/fa";
-import { IoAnalyticsSharp, IoStatsChart } from "react-icons/io5";
+import { IoAnalyticsSharp,} from "react-icons/io5";
 import {
   BsFillJournalBookmarkFill,
   BsFillQuestionCircleFill,
 } from "react-icons/bs";
-import { FaSignOutAlt } from "react-icons/fa";
+import { FaSignOutAlt, FaLightbulb } from "react-icons/fa";
 import { VscHistory } from "react-icons/vsc";
 import { SlNote } from "react-icons/sl";
-import { BsPersonCircle } from "react-icons/bs";
+import { BsPersonCircle, BsJournalText } from "react-icons/bs";
 import CurrentTime from "./components/CurrentTime";
 import CurrentDate from "./components/CurrentDate";
 
@@ -39,12 +39,17 @@ const AuthLayout: FC = () => {
       path: "/auth/interval-analysis",
     },
     {
-      icon: <IoStatsChart />,
+      icon: <BsJournalText />,
       label: "İQ-3 jurnalı",
       path: "/auth/iq3-journal",
     },
     {
       icon: <BsFillJournalBookmarkFill />,
+      label: "IQ-64 jurnalı",
+      path: "/auth/iq64-journal",
+    },
+    {
+      icon: <FaLightbulb />,
       label: "Tex.pros.planı",
       path: "/auth/technical-pros-plan",
     },
