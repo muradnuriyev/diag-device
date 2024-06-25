@@ -2,8 +2,13 @@ import { useState } from "react";
 import TesdiqButton from "../layouts/AuthLayout/components/TesdiqButton";
 import CurrentDate from "../layouts/AuthLayout/components/CurrentDate";
 import CurrentTime from "../layouts/AuthLayout/components/CurrentTime";
+import DatePicker, { registerLocale } from "react-datepicker";
+import { az } from "date-fns/locale/az";
+
+import "react-datepicker/dist/react-datepicker.css";
 
 const IQ3Journal = () => {
+  registerLocale("az", az);
   const [section, setSection] = useState("plan");
   const [sahe, setSahe] = useState(localStorage.getItem("sahe") || "");
   const [userFullName, setUserFullName] = useState(
@@ -12,10 +17,14 @@ const IQ3Journal = () => {
   const [texProsQrafikBend, setTexProsQrafikBend] = useState("9.2");
   const [note, setNote] = useState("");
   const access_token = localStorage.getItem("access_token");
+  const [selectDate, setSelectDate] = useState(new Date());
 
   const sendDataToServer = async () => {
     try {
-      const endpoint = section === "plan" ? "/store_iq3journalPlan" : "/store_iq3journalHesabat";
+      const endpoint =
+        section === "plan"
+          ? "/store_iq3journalPlan"
+          : "/store_iq3journalHesabat";
       const response = await fetch(`http://localhost:5000${endpoint}`, {
         method: "POST",
         headers: {
@@ -58,7 +67,7 @@ const IQ3Journal = () => {
               Hesabat
             </button>
           </div>
-          
+
           <div className="flex items-center mb-4">
             <div className="w-3/4">
               <h3 className="text-xl font-semibold">Sahə</h3>
@@ -89,7 +98,9 @@ const IQ3Journal = () => {
           </div>
           <div className="flex items-center mb-4">
             <div className="w-3/4">
-              <h3 className="text-xl font-semibold">Texnoloji Proses Qrafikin Bəndi</h3>
+              <h3 className="text-xl font-semibold">
+                Texnoloji Proses Qrafikin Bəndi
+              </h3>
             </div>
             <div className="w-1/4 border rounded-lg border-main-blue p-2">
               <select
@@ -116,11 +127,21 @@ const IQ3Journal = () => {
           </div>
           <div className="flex items-center mb-4">
             <div className="w-3/4">
-            <h3 className="text-xl font-semibold">
+              <h3 className="text-xl font-semibold">
                 {section === "plan" ? "Son vaxt" : "Görülən işlərin son vaxtı"}
               </h3>
             </div>
             <div className="w-1/4 border rounded-lg border-main-blue p-2">
+              <DatePicker
+                onChange={(date) => setSelectDate(date ? date : new Date())}
+                selected={selectDate}
+                showTimeSelect
+                timeIntervals={1}
+                timeFormat="p"
+                dateFormat="dd.MM.yyyy HH:mm"
+                locale="az"
+                className="px-4 py-2 rounded-lg"
+              />
               {/* Placeholder for future implementation */}
             </div>
           </div>
@@ -136,7 +157,9 @@ const IQ3Journal = () => {
                 rows={8}
                 className="w-full border rounded-lg border-main-blue p-2"
                 placeholder={
-                  section === "plan" ? "Burada görüləcək işləri yazın" : "Burada görülən işləri yazın"
+                  section === "plan"
+                    ? "Burada görüləcək işləri yazın"
+                    : "Burada görülən işləri yazın"
                 }
                 onChange={(e) => setNote(e.target.value)}
                 value={note}

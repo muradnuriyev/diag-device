@@ -58,21 +58,21 @@ const CurrentAnalysis = () => {
   }, []);
 
   const formatDate = (timestamp: string) => {
-    const date = new Date(timestamp);
-    const options: Intl.DateTimeFormatOptions = {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false,
-      timeZone: "UTC",
-    };
+    // const date = new Date(timestamp);
+    // const options: Intl.DateTimeFormatOptions = {
+    //   year: "numeric",
+    //   month: "2-digit",
+    //   day: "2-digit",
+    //   hour: "2-digit",
+    //   minute: "2-digit",
+    //   second: "2-digit",
+    //   hour12: false,
+    //   timeZone: "UTC",
+    // };
 
-    const formattedDate = date.toLocaleString("en-GB", options);
+    //const formattedDate = date.toLocaleString("en-GB", options);
 
-    return formattedDate.replace(/,/, "");
+    return timestamp.replace(/,/, "");
   };
 
   const handleButtonClick = () => {
