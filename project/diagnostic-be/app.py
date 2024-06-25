@@ -461,7 +461,7 @@ def get_table_data():
                 record = records[0]
 
                 ydInfo = "NOT OK" if record.get('YD_Info') == 0 else "OK"
-                rightOrLeftTurn = "Sağ (+)" if record.get('RightTurn') == 0 and record.get('LeftTurn') == 1 else "Sol (-)" if record.get('RightTurn') == 0 and record.get('LeftTurn') == 1 else "Nəzarət yoxdur"
+                rightOrLeftTurn = "Sağ (+)" if record.get('RightTurn') == 0 and record.get('LeftTurn') == 1 else "Sol (-)" if record.get('RightTurn') == 1 and record.get('LeftTurn') == 0 else "Nəzarət yoxdur"
                 numOfControl = record.get('NumOfControl')
                 kurbel = "Çevrilməyib" if record.get('Kurbel') == 0 else "Çevrilib"
                 sobs3ap = record.get('SOBS3AP')
