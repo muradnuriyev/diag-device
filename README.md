@@ -289,7 +289,10 @@ npm run dev
 ```
 
 By default, Vite uses `http://localhost:5173`.  
-The frontend will send requests to `http://localhost:5000` (the Flask server).
+The frontend sends requests to the backend using `API_BASE_URL`:
+
+- configured via `VITE_API_BASE_URL` in a `.env` file, or
+- defaults to `http://localhost:5000` if not set.
 
 ### Production build
 
@@ -398,4 +401,3 @@ At this point:
 - Provide a “simulation mode” for development that generates synthetic measurement data without a real microcontroller.
 
 This README is intended to be a high‑level map of the system so that someone new can understand how the microcontroller, MySQL databases, backend, and web UI fit together and where to continue development.
-

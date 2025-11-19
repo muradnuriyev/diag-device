@@ -3,6 +3,7 @@ import { GrFormAdd } from "react-icons/gr";
 import TesdiqButton from "../layouts/AuthLayout/components/TesdiqButton";
 import CurrentDate from "../layouts/AuthLayout/components/CurrentDate";
 import CurrentTime from "../layouts/AuthLayout/components/CurrentTime";
+import { API_BASE_URL } from "../config";
 
 interface Note {
   Sahe: string;
@@ -31,7 +32,7 @@ const NoteComponent = () => {
 
   const sendDataToServer = async () => {
     try {
-      const response = await fetch("http://localhost:5000/store_note", {
+      const response = await fetch(`${API_BASE_URL}/store_note`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sahe, userFullName, note }),
@@ -55,7 +56,7 @@ const NoteComponent = () => {
 
   const fetchNotes = async () => {
     try {
-      const response = await fetch("http://localhost:5000/get_notes");
+      const response = await fetch(`${API_BASE_URL}/get_notes`);
       if (response.ok) {
         const data = await response.json();
         setNotes(data.notes);

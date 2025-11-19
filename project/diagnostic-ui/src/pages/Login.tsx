@@ -5,6 +5,7 @@ import TextInput from "@components/TextInput";
 import logo from "@assets/logo.png";
 import { BsPersonFill } from "react-icons/bs";
 import axios from "axios";
+import { API_BASE_URL } from "../config";
 
 const Login: FC = memo(() => {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ const Login: FC = memo(() => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://localhost:5000/login", {
+      const response = await axios.post(`${API_BASE_URL}/login`, {
         username,
         password,
       });

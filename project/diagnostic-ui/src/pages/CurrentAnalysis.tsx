@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import TesdiqButton from "../layouts/AuthLayout/components/TesdiqButton";
+import { API_BASE_URL } from "../config";
 
 interface TableData {
   [key: string]: React.ReactNode;
@@ -34,7 +35,7 @@ const CurrentAnalysis = () => {
   const [tableData, setTableData] = useState<TableData>({});
 
   useEffect(() => {
-    fetch("http://localhost:5000/table_numbers")
+    fetch(`${API_BASE_URL}/table_numbers`)
       .then((response) => response.json())
       .then((data) => {
         setTableNumbers(data.table_numbers);
@@ -65,7 +66,7 @@ const CurrentAnalysis = () => {
   const handleButtonClick = () => {
     if (selectedTableNumber) {
       const selectedTableName = `yd_${selectedTableNumber}`;
-      fetch("http://localhost:5000/table_data", {
+      fetch(`${API_BASE_URL}/table_data`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -80,7 +81,7 @@ const CurrentAnalysis = () => {
         })
         .then((data) => {
           setTableData(data);
-          fetch("http://localhost:5000/alarms")
+          fetch(`${API_BASE_URL}/alarms`)
             .then((response) => response.json())
             .catch((error) => {
               console.error("Error fetching alarms:", error);

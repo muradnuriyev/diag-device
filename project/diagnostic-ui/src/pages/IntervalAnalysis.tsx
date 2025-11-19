@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { AiOutlineMinus } from "react-icons/ai";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, BarChart, Bar } from "recharts";
 import TesdiqButton from "../layouts/AuthLayout/components/TesdiqButton";
+import { API_BASE_URL } from "../config";
 
 interface CurrentValuesItem {
   Timestamp: string;
@@ -61,17 +62,17 @@ const IntervalAnalysisPage = () => {
       const formattedFromTimestamp = new Date(fromTimestamp).toISOString();
       const formattedToTimestamp = new Date(toTimestamp).toISOString();
 
-      const currentValuesUrl = `http://localhost:5000/current_values_data/yd_${selectedTable}/${formattedFromTimestamp}/${formattedToTimestamp}`;
-      const currentAccidentValuesUrl = `http://localhost:5000/current_accident_values_data/yd_${selectedTable}/${formattedFromTimestamp}/${formattedToTimestamp}`;     
-      const uAllUrl = `http://localhost:5000/u_all_data/yd_${selectedTable}/${formattedFromTimestamp}/${formattedToTimestamp}`;     
-      const kurbelUrl = `http://localhost:5000/kurbel_data/yd_${selectedTable}/${formattedFromTimestamp}/${formattedToTimestamp}`;     
-      const VofDeviceUrl = `http://localhost:5000/v_of_device_data/yd_${selectedTable}/${formattedFromTimestamp}/${formattedToTimestamp}`;   
-      const temperatureUrl = `http://localhost:5000/temperature_data/yd_${selectedTable}/${formattedFromTimestamp}/${formattedToTimestamp}`;
-      const BlockContactNUrl = `http://localhost:5000/block_contact_n_data/yd_${selectedTable}/${formattedFromTimestamp}/${formattedToTimestamp}`;
-      const BlockContactUrl = `http://localhost:5000/block_contact_data/yd_${selectedTable}/${formattedFromTimestamp}/${formattedToTimestamp}`;
-      const conversionPeriodUrl = `http://localhost:5000/conversion_period_data/yd_${selectedTable}/${formattedFromTimestamp}/${formattedToTimestamp}`;
-      const numOfControlUrl = `http://localhost:5000/num_of_control_data/yd_${selectedTable}/${formattedFromTimestamp}/${formattedToTimestamp}`;
-      const sobsLostOfControlUrl = `http://localhost:5000/sobs_lost_of_control_data/yd_${selectedTable}/${formattedFromTimestamp}/${formattedToTimestamp}`;
+      const currentValuesUrl = `${API_BASE_URL}/current_values_data/yd_${selectedTable}/${formattedFromTimestamp}/${formattedToTimestamp}`;
+      const currentAccidentValuesUrl = `${API_BASE_URL}/current_accident_values_data/yd_${selectedTable}/${formattedFromTimestamp}/${formattedToTimestamp}`;
+      const uAllUrl = `${API_BASE_URL}/u_all_data/yd_${selectedTable}/${formattedFromTimestamp}/${formattedToTimestamp}`;
+      const kurbelUrl = `${API_BASE_URL}/kurbel_data/yd_${selectedTable}/${formattedFromTimestamp}/${formattedToTimestamp}`;
+      const VofDeviceUrl = `${API_BASE_URL}/v_of_device_data/yd_${selectedTable}/${formattedFromTimestamp}/${formattedToTimestamp}`;
+      const temperatureUrl = `${API_BASE_URL}/temperature_data/yd_${selectedTable}/${formattedFromTimestamp}/${formattedToTimestamp}`;
+      const BlockContactNUrl = `${API_BASE_URL}/block_contact_n_data/yd_${selectedTable}/${formattedFromTimestamp}/${formattedToTimestamp}`;
+      const BlockContactUrl = `${API_BASE_URL}/block_contact_data/yd_${selectedTable}/${formattedFromTimestamp}/${formattedToTimestamp}`;
+      const conversionPeriodUrl = `${API_BASE_URL}/conversion_period_data/yd_${selectedTable}/${formattedFromTimestamp}/${formattedToTimestamp}`;
+      const numOfControlUrl = `${API_BASE_URL}/num_of_control_data/yd_${selectedTable}/${formattedFromTimestamp}/${formattedToTimestamp}`;
+      const sobsLostOfControlUrl = `${API_BASE_URL}/sobs_lost_of_control_data/yd_${selectedTable}/${formattedFromTimestamp}/${formattedToTimestamp}`;
 
 //  Current Values 1-10----------------------------------------------------------------------------------------------------------------------------------
         fetch(currentValuesUrl)
@@ -228,7 +229,7 @@ const IntervalAnalysisPage = () => {
 
 
   useEffect(() => {
-    fetch('http://localhost:5000/table_numbers')
+    fetch(`${API_BASE_URL}/table_numbers`)
       .then(response => response.json())
       .then(data => setTableNumbers(data.table_numbers))
       .catch(error => console.error('Error fetching table numbers:', error));
@@ -241,7 +242,7 @@ const IntervalAnalysisPage = () => {
       setToTimestamp('');
       setTableChanged(false);
 
-      fetch(`http://localhost:5000/timestamps/${selectedTable}`)
+      fetch(`${API_BASE_URL}/timestamps/${selectedTable}`)
         .then(response => response.json())
         .then(data => {
           console.log(data);

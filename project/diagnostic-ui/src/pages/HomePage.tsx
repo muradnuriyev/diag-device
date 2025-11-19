@@ -5,6 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import notificationSound from "/src/sounds/notification.mp3";
+import { API_BASE_URL } from "../config";
 
 interface Alarm {
   Conversion_Period_Difference: number;
@@ -47,7 +48,8 @@ const HomePage = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      axios.get("http://localhost:5000/alarms")
+      axios
+        .get(`${API_BASE_URL}/alarms`)
         .then((response) => {
           console.log("Response data:", response.data);
           if (response.data.length > alarms.length) {
