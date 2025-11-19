@@ -24,3 +24,32 @@ services:
       - "8080:80"
     depends_on:
       - mysql
+
+  backend:
+    build:
+      context: .
+      dockerfile: project/diagnostic-be/Dockerfile
+    container_name: diag-backend
+    restart: unless-stopped
+    environment:
+      DB_HOST: mysql
+      DB_USER: root
+      DB_PASSWORD: ""
+      FRONTEND_ORIGIN: http://localhost:5173
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mysql
+
+  frontend:
+    build:
+      context: .
+      dockerfile: project/diagnostic-ui/Dockerfile
+      args:
+        VITE_API_BASE_URL: http://localhost:5000
+    container_name: diag-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend

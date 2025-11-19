@@ -1,18 +1,16 @@
-import {
-  Navigate,
-  RouterProvider,
-  createBrowserRouter,
-} from "react-router-dom";
-import LoginPage from "./pages/Login";
-import HomePage from "@pages/HomePage";
+import { Suspense, lazy } from "react";
+import { Navigate, RouterProvider, createBrowserRouter } from "react-router-dom";
 import AuthLayout from "./layouts/AuthLayout";
-import HelpPage from "@pages/Help";
-import HistoryPage from "@pages/History";
-import NotePage from "@pages/Note";
-import TechnicalProsPlanPage from "@pages/TechnicalProsPlan";
-import IQ3JournalPage from "@pages/IQ3Journal";
-import CurrentAnalysisPage from "@pages/CurrentAnalysis";
-import IntervalAnalysisPage from "@pages/IntervalAnalysis";
+
+const LoginPage = lazy(() => import("./pages/Login"));
+const HomePage = lazy(() => import("./pages/HomePage"));
+const HelpPage = lazy(() => import("./pages/Help"));
+const HistoryPage = lazy(() => import("./pages/History"));
+const NotePage = lazy(() => import("./pages/Note"));
+const TechnicalProsPlanPage = lazy(() => import("./pages/TechnicalProsPlan"));
+const IQ3JournalPage = lazy(() => import("./pages/IQ3Journal"));
+const CurrentAnalysisPage = lazy(() => import("./pages/CurrentAnalysis"));
+const IntervalAnalysisPage = lazy(() => import("./pages/IntervalAnalysis"));
 
 const router = createBrowserRouter([
   {
@@ -70,7 +68,15 @@ const router = createBrowserRouter([
 function App() {
   return (
     <div className="h-full w-full bg-white">
-      <RouterProvider router={router} />
+      <Suspense
+        fallback={
+          <div className="h-full w-full flex items-center justify-center">
+            <span className="text-gray-600">Loading...</span>
+          </div>
+        }
+      >
+        <RouterProvider router={router} />
+      </Suspense>
     </div>
   );
 }

@@ -3,17 +3,23 @@ from flask_cors import CORS
 from datetime import datetime, timezone, timedelta
 import mysql.connector.pooling
 import types
+import os
 
+
+DB_HOST = os.environ.get("DB_HOST", "localhost")
+DB_USER = os.environ.get("DB_USER", "root")
+DB_PASSWORD = os.environ.get("DB_PASSWORD", "")
+FRONTEND_ORIGIN = os.environ.get("FRONTEND_ORIGIN", "http://localhost:5173")
 
 app = Flask(__name__)
-CORS(app, origins="http://localhost:5173")
+CORS(app, origins=FRONTEND_ORIGIN)
 
 user_db_config = {
     "pool_name": "user_db_pool",
     "pool_size": 10,
-    "host": "localhost",
-    "user": "root",
-    "password": "",
+    "host": DB_HOST,
+    "user": DB_USER,
+    "password": DB_PASSWORD,
     "database": "yd_user_db",
     "connect_timeout": 30,
 }
@@ -21,9 +27,9 @@ user_db_config = {
 user_note_db_config = {
     "pool_name": "user_note_db_pool",
     "pool_size": 10,
-    "host": "localhost",
-    "user": "root",
-    "password": "",
+    "host": DB_HOST,
+    "user": DB_USER,
+    "password": DB_PASSWORD,
     "database": "yd_note_workers",
     "connect_timeout": 30,
 }
@@ -31,9 +37,9 @@ user_note_db_config = {
 info_package_db_config = {
     "pool_name": "info_package_db_pool",
     "pool_size": 10,
-    "host": "localhost",
-    "user": "root",
-    "password": "",
+    "host": DB_HOST,
+    "user": DB_USER,
+    "password": DB_PASSWORD,
     "database": "yd_information_package",
     "connect_timeout": 30,
 }

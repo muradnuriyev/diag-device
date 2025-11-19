@@ -22,6 +22,50 @@ Some other UI tabs were planned but are only partially implemented.
 
 ---
 
+## Quick start
+
+The fastest way to see the system working end-to-end is via Docker.
+
+From the repository root:
+
+```bash
+ docker compose up -d
+```
+
+Then open:
+
+- Web UI: `http://localhost:5173`
+- Backend (for API tests): `http://localhost:5000`
+- phpMyAdmin: `http://localhost:8080` (user `root`, empty password)
+
+On first run, the containers automatically create and populate all three databases:
+
+- `yd_user_db` � users and roles;
+- `yd_information_package` � measurement tables `yd_1..yd_58`;
+- `yd_note_workers` � operator notes.
+
+If you also want to stream live data from a microcontroller, run the desktop `dataset` app after this (see "Running the dataset application" below).
+
+---
+
+## Table of contents
+
+1. [Repository structure](#repository-structure)
+2. [High-level architecture](#high-level-architecture)
+   - [Data acquisition (dataset app)](#1-data-acquisition-dataset-app)
+   - [Databases](#2-databases)
+   - [Backend API](#3-backend-api-flask-projectdiagnostic-be)
+   - [Frontend](#4-frontend-reactvite-projectdiagnostic-ui)
+3. [Running MySQL and phpMyAdmin via Docker](#running-mysql-and-phpmyadmin-via-docker)
+4. [Running the backend (Flask API)](#running-the-backend-flask-api)
+5. [Running the frontend (ReactVite)](#running-the-frontend-reactvite)
+6. [Running the dataset application](#running-the-dataset-application)
+7. [What is currently working](#what-is-currently-working)
+8. [Typical end-to-end startup sequence](#typical-end-to-end-startup-sequence)
+9. [Possible future improvements](#possible-future-improvements)
+
+---
+
 ## Repository structure
 
 - `dataset/datasetYD.py` – desktop app (Tkinter) for reading packets from the microcontroller and writing them to the `yd_information_package` database.
@@ -149,7 +193,7 @@ Key parts:
   - `POST /store_note` – store a note into `yd_note_workers.yd_note_workers`.
   - `GET /get_notes` – list notes (used by the Note page).
 
-### 4. Frontend (React/Vite, `project/diagnostic-ui`)
+### 4. front-end (React/Vite, `project/diagnostic-ui`)
 
 Routing is defined in `src/App.tsx` using `react-router-dom`:
 
@@ -248,7 +292,7 @@ You should see `diag-mysql` and `diag-phpmyadmin` in `Up` state.
 
 The backend expects MySQL to be available at `localhost:3306` with user `root` and an empty password (the Docker compose file is configured for this).
 
-### Install dependencies
+### Install dependencies (local run)
 
 Run once:
 
@@ -256,7 +300,7 @@ Run once:
 python -m pip install flask flask-cors mysql-connector-python
 ```
 
-### Start the server
+### Start the server (local run)
 
 ```bash
 cd project/diagnostic-be
@@ -273,7 +317,34 @@ Make sure `docker compose up -d` has been run before this step, otherwise the ba
 
 ---
 
-## Running the frontend (React/Vite)
+### Running the backend via Docker
+
+You can also run the backend as part of Docker Compose (together with MySQL and phpMyAdmin).
+
+From the repo root:
+
+```bash
+docker compose up -d
+```
+
+This will start:
+
+- `diag-mysql` – MySQL,
+- `diag-phpmyadmin` – phpMyAdmin,
+- `diag-backend` – Flask API, listening on `http://localhost:5000`.
+
+The backend container uses these environment variables (set in `docker-compose.yml`):
+
+- `DB_HOST` – MySQL host (`mysql` inside the Docker network);
+- `DB_USER` – MySQL user (`root`);
+- `DB_PASSWORD` – MySQL password (empty by default);
+- `front-end_ORIGIN` – allowed CORS origin for the front-end (`http://localhost:5173`).
+
+For local (non‑Docker) runs, you can override the same variables in your environment if needed.
+
+---
+
+## Running the front-end (React/Vite)
 
 ### Install Node dependencies
 
@@ -282,14 +353,14 @@ cd project/diagnostic-ui
 npm install
 ```
 
-### Development server
+### Development server (local)
 
 ```bash
 npm run dev
 ```
 
 By default, Vite uses `http://localhost:5173`.  
-The frontend sends requests to the backend using `API_BASE_URL`:
+The front-end sends requests to the backend using `API_BASE_URL`:
 
 - configured via `VITE_API_BASE_URL` in a `.env` file, or
 - defaults to `http://localhost:5000` if not set.
@@ -301,6 +372,24 @@ npm run build
 ```
 
 Build output lives in `project/diagnostic-ui/dist`.
+
+---
+
+### Running the front-end via Docker
+
+The front-end can also be started as a Docker service.
+
+From the repo root:
+
+```bash
+docker compose up -d front-end
+```
+
+This will build the React app and serve it via Nginx at:
+
+- `http://localhost:5173`
+
+The Docker build passes `VITE_API_BASE_URL=http://localhost:5000`, so the front-end in Docker still talks to the backend on your host at port `5000`.
 
 ---
 
@@ -369,7 +458,7 @@ Other tabs exist but may be incomplete or stubbed.
    python app.py
    ```
 
-3. Start frontend:
+3. Start front-end:
 
    ```bash
    cd project/diagnostic-ui
@@ -388,7 +477,7 @@ At this point:
 
 - databases are running in Docker;
 - backend is available at `http://localhost:5000`;
-- frontend is available at `http://localhost:5173`;
+- front-end is available at `http://localhost:5173`;
 - dataset app (if running) continuously feeds new measurements into MySQL.
 
 ---
@@ -396,8 +485,11 @@ At this point:
 ## Possible future improvements
 
 - Implement full backend logic for the remaining UI tabs (`History`, `Help`, `TechnicalProsPlan`, `IQ3Journal`).
-- Add Docker images for backend and frontend so that the entire system can be started with a single `docker compose up` (including API and UI).
+- Add Docker images for backend and front-end so that the entire system can be started with a single `docker compose up` (including API and UI).
 - Move database credentials (`root` / empty password, hosts, ports) into environment variables instead of hard‑coding.
 - Provide a “simulation mode” for development that generates synthetic measurement data without a real microcontroller.
 
 This README is intended to be a high‑level map of the system so that someone new can understand how the microcontroller, MySQL databases, backend, and web UI fit together and where to continue development.
+
+
+

@@ -11,4 +11,16 @@ export default defineConfig({
     },
   },
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ["react", "react-dom"],
+          recharts: ["recharts"],
+          chartjs: ["chart.js", "react-chartjs-2"],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1024,
+  },
 });
