@@ -1,13 +1,41 @@
-import { useState, useEffect } from 'react';
-import { AiOutlineMinus } from 'react-icons/ai';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, BarChart, Bar  } from 'recharts';
-import TesdiqButton from '../layouts/AuthLayout/components/TesdiqButton';
+import { useState, useEffect } from "react";
+import { AiOutlineMinus } from "react-icons/ai";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, BarChart, Bar } from "recharts";
+import TesdiqButton from "../layouts/AuthLayout/components/TesdiqButton";
+
+interface CurrentValuesItem {
+  Timestamp: string;
+  CurrentValue1: number;
+  CurrentValue2: number;
+  CurrentValue3: number;
+  CurrentValue4: number;
+  CurrentValue5: number;
+  CurrentValue6: number;
+  CurrentValue7: number;
+  CurrentValue8: number;
+  CurrentValue9: number;
+  CurrentValue10: number;
+}
+
+interface UAllItem {
+  Timestamp: string;
+  U_AB: number;
+  U_BC: number;
+  U_AC: number;
+}
+
+interface CurrentAccidentValuesItem {
+  Timestamp: string;
+  Current_Accident_A: number;
+  Current_Accident_B: number;
+  Current_Accident_C: number;
+}
 
 const IntervalAnalysisPage = () => {
   const [tableNumbers, setTableNumbers] = useState([]);
-  const [selectedTable, setSelectedTable] = useState('');
-  const [fromTimestamp, setFromTimestamp] = useState('');
-  const [toTimestamp, setToTimestamp] = useState('');
+  const [selectedTable, setSelectedTable] = useState("");
+  const [fromTimestamp, setFromTimestamp] = useState("");
+  const [toTimestamp, setToTimestamp] = useState("");
   const [timestamps, setTimestamps] = useState([]);
   const [VofDeviceData, setVofDeviceData] = useState([]);
   const [temperatureData, setTemperatureData] = useState([]);
@@ -50,46 +78,42 @@ const IntervalAnalysisPage = () => {
           .then((response) => response.json())
           .then((data) => {
             console.log(data);
-            const { currentValuesData } = data;
-            const combinedCurrentValuesData = currentValuesData.map((item: { Timestamp: any; CurrentValue1: any; CurrentValue2: any; CurrentValue3: any; CurrentValue4: any; CurrentValue5: any; CurrentValue6: any; CurrentValue7: any; CurrentValue8: any; CurrentValue9: any; CurrentValue10: any; }) => {
-              return {
-                Timestamp: item.Timestamp,
-                CurrentValue1: item.CurrentValue1,
-                CurrentValue2: item.CurrentValue2,
-                CurrentValue3: item.CurrentValue3,
-                CurrentValue4: item.CurrentValue4,
-                CurrentValue5: item.CurrentValue5,
-                CurrentValue6: item.CurrentValue6,
-                CurrentValue7: item.CurrentValue7,
-                CurrentValue8: item.CurrentValue8,
-                CurrentValue9: item.CurrentValue9,
-                CurrentValue10: item.CurrentValue10,
-              };
-            });
+            const { currentValuesData } = data as { currentValuesData: CurrentValuesItem[] };
+            const combinedCurrentValuesData = currentValuesData.map((item) => ({
+              Timestamp: item.Timestamp,
+              CurrentValue1: item.CurrentValue1,
+              CurrentValue2: item.CurrentValue2,
+              CurrentValue3: item.CurrentValue3,
+              CurrentValue4: item.CurrentValue4,
+              CurrentValue5: item.CurrentValue5,
+              CurrentValue6: item.CurrentValue6,
+              CurrentValue7: item.CurrentValue7,
+              CurrentValue8: item.CurrentValue8,
+              CurrentValue9: item.CurrentValue9,
+              CurrentValue10: item.CurrentValue10,
+            }));
             setCombinedCurrentValues(combinedCurrentValuesData);
             setShowChart(true);
           })
-        .catch((error) => console.error('Error fetching Current Values data:', error));
+        .catch((error) => console.error("Error fetching Current Values data:", error));
 //  Current Values 1-10----------------------------------------------------------------------------------------------------------------------------------
 
 // U_AB, U_BC, U_AC ----------------------------------------------------------------------------------------------------------------------------------
-        fetch(uAllUrl )
+        fetch(uAllUrl)
           .then((response) => response.json())
           .then((data) => {
             console.log(data);
-            const { uAllData } = data;
-            const combinedUAllData = uAllData.map((item: { Timestamp: any; U_AB: any; U_BC: any; U_AC: any;}) => {
-              return {
-                Timestamp: item.Timestamp,
-                U_AB: item.U_AB,
-                U_BC: item.U_BC,
-                U_AC: item.U_AC,
-              };
-            });
+            const { uAllData } = data as { uAllData: UAllItem[] };
+            const combinedUAllData = uAllData.map((item) => ({
+              Timestamp: item.Timestamp,
+              U_AB: item.U_AB,
+              U_BC: item.U_BC,
+              U_AC: item.U_AC,
+            }));
             setUAllData(combinedUAllData);
             setShowChart(true);
           })
-        .catch((error) => console.error('Error fetching U Values data:', error));
+        .catch((error) => console.error("Error fetching U Values data:", error));
 // U_AB, U_BC, U_AC ----------------------------------------------------------------------------------------------------------------------------------
 
 //Current Accident Values ----------------------------------------------------------------------------------------------------------------------------------
@@ -97,19 +121,17 @@ const IntervalAnalysisPage = () => {
           .then((response) => response.json())
           .then((data) => {
             console.log(data);
-            const { currentAccidentValuesData } = data;
-            const combinedCurrentAccidentValuesData = currentAccidentValuesData.map((item: { Timestamp: any; Current_Accident_A: any; Current_Accident_B: any; Current_Accident_C: any;}) => {
-              return {
-                Timestamp: item.Timestamp,
-                Current_Accident_A: item.Current_Accident_A,
-                Current_Accident_B: item.Current_Accident_B,
-                Current_Accident_C: item.Current_Accident_C,
-              };
-            });
+            const { currentAccidentValuesData } = data as { currentAccidentValuesData: CurrentAccidentValuesItem[] };
+            const combinedCurrentAccidentValuesData = currentAccidentValuesData.map((item) => ({
+              Timestamp: item.Timestamp,
+              Current_Accident_A: item.Current_Accident_A,
+              Current_Accident_B: item.Current_Accident_B,
+              Current_Accident_C: item.Current_Accident_C,
+            }));
             setCombinedCurrentAccidentValues(combinedCurrentAccidentValuesData);
             setShowChart(true);
           })
-        .catch((error) => console.error('Error fetching Current Accident Values data:', error));
+        .catch((error) => console.error("Error fetching Current Accident Values data:", error));
 //Current Accident Values ----------------------------------------------------------------------------------------------------------------------------------
 
 //V of Device ----------------------------------------------------------------------------------------------------------------------------------------------

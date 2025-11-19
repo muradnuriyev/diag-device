@@ -55,14 +55,8 @@ const HomePage = () => {
             setAlarms(response.data);
             setLoading(false);
             notifyAlarm(newAlarm);
-            {
-              document.documentElement.style.setProperty('--warning-color', '#FF0000');
-              playNotificationSound(); 
-            }
-            
-            console.log('currentPage:', currentPage);
-            console.log('alarmsPerPage:', alarmsPerPage);
-            console.log('totalAlarms:', alarms.length);
+            document.documentElement.style.setProperty("--warning-color", "#FF0000");
+            playNotificationSound();
           }
         })
         .catch((error) => {

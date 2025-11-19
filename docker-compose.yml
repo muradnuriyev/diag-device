@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: diag-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docker/mysql-init:/docker-entrypoint-initdb.d
+      - ./yd_user_db.sql:/sql/yd_user_db.sql:ro
+      - ./yd_information_package.sql:/sql/yd_information_package.sql:ro
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5
+    container_name: diag-phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: ""
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+

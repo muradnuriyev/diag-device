@@ -21,7 +21,7 @@ SET time_zone = "+00:00";
 -- База данных: `yd_information_package`
 --
 
-DELIMITER $$
+/* DELIMITER $$
 --
 -- Процедуры
 --
@@ -82,7 +82,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `Rename_Columns` ()   BEGIN
     CLOSE cur;
 END$$
 
-DELIMITER ;
+DELIMITER ; */
 
 -- --------------------------------------------------------
 
